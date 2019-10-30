@@ -29,9 +29,13 @@ module ComponentEmbeddedRuby
         elsif char == "/"
           tokens.push(Token.new(:slash, nil))
           @position += 1
+        elsif tokens.last.type == :close_carrot && is_letter?(char)
+          tokens.push(
+            Token.new(:string, read_body_string)
+          )
         elsif is_letter?(char)
           tokens.push(
-            Token.new(:string, read_string)
+            Token.new(:identifier, read_string)
           )
         else
           @position += 1
@@ -75,6 +79,17 @@ module ComponentEmbeddedRuby
       string
     end
 
+    def read_body_string
+      string = ""
+
+      while @content[@position] != "<"
+        raise "unterminated content" if @position > @content.length
+        string += @content[@position]
+        @position += 1
+      end
+
+      string
+    end
     def unescaped_quote?
       @content[@position] == "\"" && @content[@position -1] != "\\"
     end

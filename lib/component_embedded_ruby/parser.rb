@@ -33,7 +33,7 @@ module ComponentEmbeddedRuby
     def parse_open_tag
       @position +=1 # already matching a <
 
-      if current_token.type != :string
+      if current_token.type != :identifier
         raise "Unexpected token, expected string"
       else
         tag = current_token.value
@@ -62,7 +62,7 @@ module ComponentEmbeddedRuby
         @position += 1
       end
 
-      if current_token.type != :string
+      if current_token.type != :identifier
         raise "Unexpected token, expected closing string"
       elsif current_token.value != tag
         raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
@@ -96,7 +96,7 @@ module ComponentEmbeddedRuby
     end
 
     def parse_attribute
-      if current_token.type != :string
+      if current_token.type != :identifier
         raise "unexpected token, expected string"
       else
         key = current_token.value
