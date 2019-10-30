@@ -52,11 +52,15 @@ module ComponentEmbeddedRuby
     attr_reader :content
     attr_accessor :position
 
+    def current_token
+      content[@position]
+    end
+
     def read_string
       string = ""
 
-      while is_letter?(@content[@position]) && @position < @content.length
-        string += @content[@position]
+      while is_letter?(current_token) && @position < @content.length
+        string += current_token
         @position += 1
       end
 
@@ -71,7 +75,7 @@ module ComponentEmbeddedRuby
 
       while !unescaped_quote?
         raise "unterminated string" if @position > @content.length
-        string += @content[@position]
+        string += current_token
         @position += 1
       end
 
@@ -84,9 +88,9 @@ module ComponentEmbeddedRuby
     def read_body_string
       string = ""
 
-      while @content[@position] != "<"
+      while current_token != "<"
         raise "unterminated content" if @position > @content.length
-        string += @content[@position]
+        string += current_token
         @position += 1
       end
 
@@ -101,8 +105,8 @@ module ComponentEmbeddedRuby
       @position += 1
 
       loop do
-        break if inner_bracket_count == 0 && @content[@position] == "}"
-        char = @content[@position]
+        break if inner_bracket_count == 0 && current_token == "}"
+        char = current_token
         string += char
 
         if char == "{"
@@ -118,7 +122,7 @@ module ComponentEmbeddedRuby
     end
 
     def unescaped_quote?
-      @content[@position] == "\"" && @content[@position -1] != "\\"
+      current_token == "\"" && @content[@position -1] != "\\"
     end
 
     def is_letter?(char)
