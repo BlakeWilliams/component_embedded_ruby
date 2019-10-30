@@ -14,11 +14,11 @@ module ComponentEmbeddedRuby
     attr_reader :tokens
 
     def parse_tag
-      if current_token.type == Lexer::TOKEN_OPEN_CARROT && next_token.type == Lexer::TOKEN_SLASH
+      if current_token.type == :open_carrot && next_token.type == :slash
         nil
-      elsif current_token.type == Lexer::TOKEN_OPEN_CARROT && next_token.type != Lexer::TOKEN_SLASH
+      elsif current_token.type == :open_carrot && next_token.type != :slash
         parse_open_tag
-      elsif current_token.type == Lexer::TOKEN_STRING
+      elsif current_token.type == :string
         @position += 1
         {
           tag: nil,
@@ -33,7 +33,7 @@ module ComponentEmbeddedRuby
     def parse_open_tag
       @position +=1 # already matching a <
 
-      if current_token.type != Lexer::TOKEN_STRING
+      if current_token.type != :string
         raise "Unexpected token, expected string"
       else
         tag = current_token.value
@@ -50,19 +50,19 @@ module ComponentEmbeddedRuby
         child = parse_tag
       end
 
-      if current_token.type != Lexer::TOKEN_OPEN_CARROT
+      if current_token.type != :open_carrot
         raise "Unexpected token, expected <"
       else
         @position += 1
       end
 
-      if current_token.type != Lexer::TOKEN_SLASH
+      if current_token.type != :slash
         raise "Unexpected token, expected /"
       else
         @position += 1
       end
 
-      if current_token.type != Lexer::TOKEN_STRING
+      if current_token.type != :string
         raise "Unexpected token, expected closing string"
       elsif current_token.value != tag
         raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
@@ -70,7 +70,7 @@ module ComponentEmbeddedRuby
         @position += 1
       end
 
-      if current_token.type != Lexer::TOKEN_CLOSE_CARROT
+      if current_token.type != :close_carrot
         raise "Unexpected token, expected >"
       else
         @position += 1
@@ -86,7 +86,7 @@ module ComponentEmbeddedRuby
     def parse_attributes
       attributes = []
 
-      while current_token.type != Lexer::TOKEN_CLOSE_CARROT
+      while current_token.type != :close_carrot
         attributes.push(parse_attribute)
       end
 
@@ -96,20 +96,20 @@ module ComponentEmbeddedRuby
     end
 
     def parse_attribute
-      if current_token.type != Lexer::TOKEN_STRING
+      if current_token.type != :string
         raise "unexpected token, expected string"
       else
         key = current_token.value
         @position += 1
       end
 
-      if current_token.type != Lexer::TOKEN_EQUALS
+      if current_token.type != :equals
         raise "unexpected token, expected equals"
       else
         @position += 1
       end
 
-      if current_token.type != Lexer::TOKEN_STRING
+      if current_token.type != :string
         raise "unexpected token, expected string"
       else
         value = current_token.value

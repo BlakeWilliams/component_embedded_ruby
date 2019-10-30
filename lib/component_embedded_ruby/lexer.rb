@@ -1,11 +1,5 @@
 module ComponentEmbeddedRuby
   class Lexer
-    TOKEN_OPEN_CARROT = "<"
-    TOKEN_CLOSE_CARROT = ">"
-    TOKEN_EQUALS = "="
-    TOKEN_QUOTE = "\""
-    TOKEN_SLASH = "/"
-    TOKEN_STRING = "token_string"
     Token = Struct.new(:type, :value)
 
     def initialize(content)
@@ -19,26 +13,25 @@ module ComponentEmbeddedRuby
       while position != @content.length
         char = content[@position]
 
-        if char == TOKEN_OPEN_CARROT
-          tokens.push(Token.new(TOKEN_OPEN_CARROT, nil))
+        if char == "<"
+          tokens.push(Token.new(:open_carrot, nil))
           @position += 1
-        elsif char == TOKEN_CLOSE_CARROT
-          tokens.push(Token.new(TOKEN_CLOSE_CARROT, nil))
+        elsif char == ">"
+          tokens.push(Token.new(:close_carrot, nil))
           @position += 1
-        elsif char == TOKEN_EQUALS
-          tokens.push(Token.new(TOKEN_EQUALS, nil))
+        elsif char == "="
+          tokens.push(Token.new(:equals, nil))
           @position += 1
-        elsif char == TOKEN_QUOTE
-          # TODO parse between quotes
+        elsif char == "\""
           tokens.push(
-            Token.new(TOKEN_STRING, read_quoted_string)
+            Token.new(:string, read_quoted_string)
           )
-        elsif char == TOKEN_SLASH
-          tokens.push(Token.new(TOKEN_SLASH, nil))
+        elsif char == "/"
+          tokens.push(Token.new(:slash, nil))
           @position += 1
         elsif is_letter?(char)
           tokens.push(
-            Token.new(TOKEN_STRING, read_string)
+            Token.new(:string, read_string)
           )
         else
           @position += 1

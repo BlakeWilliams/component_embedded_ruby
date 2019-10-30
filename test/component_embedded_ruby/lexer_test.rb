@@ -6,13 +6,13 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("<html></html>")
 
       expected = [
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:string, "html"),
+        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:string, "html"),
+        Lexer::Token.new(:close_carrot, nil),
       ]
 
       expected.zip(lexer.lex).each do |expected, received|
@@ -26,16 +26,16 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new('<html id="main"></html>')
 
       assert_equal [
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "id"),
-        Lexer::Token.new(Lexer::TOKEN_EQUALS, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "main"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:string, "html"),
+        Lexer::Token.new(:string, "id"),
+        Lexer::Token.new(:equals, nil),
+        Lexer::Token.new(:string, "main"),
+        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:string, "html"),
+        Lexer::Token.new(:close_carrot, nil),
       ], lexer.lex
     end
 
@@ -43,23 +43,23 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("<html><p></p></html>")
 
       expected = [
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:string, "html"),
+        Lexer::Token.new(:close_carrot, nil),
 
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "p"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:string, "p"),
+        Lexer::Token.new(:close_carrot, nil),
 
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "p"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:string, "p"),
+        Lexer::Token.new(:close_carrot, nil),
 
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:string, "html"),
+        Lexer::Token.new(:close_carrot, nil),
       ]
 
       expected.zip(lexer.lex).each do |expected, received|
@@ -73,17 +73,17 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new('<p name="hello >< \" world!"></p>')
 
       expected = [
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "p"),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "name"),
-        Lexer::Token.new(Lexer::TOKEN_EQUALS, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "hello >< \\\" world!"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:string, "p"),
+        Lexer::Token.new(:string, "name"),
+        Lexer::Token.new(:equals, nil),
+        Lexer::Token.new(:string, "hello >< \\\" world!"),
+        Lexer::Token.new(:close_carrot, nil),
 
-        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
-        Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
-        Lexer::Token.new(Lexer::TOKEN_STRING, "p"),
-        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:string, "p"),
+        Lexer::Token.new(:close_carrot, nil),
       ]
 
       expected.zip(lexer.lex).each do |expected, received|
