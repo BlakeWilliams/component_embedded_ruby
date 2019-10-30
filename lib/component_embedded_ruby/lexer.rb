@@ -13,7 +13,7 @@ module ComponentEmbeddedRuby
       @position = 0
     end
 
-    def parse
+    def lex
       tokens = []
 
       while position != @content.length
@@ -29,6 +29,7 @@ module ComponentEmbeddedRuby
           tokens.push(Token.new(TOKEN_EQUALS, nil))
           @position += 1
         elsif char == TOKEN_QUOTE
+          # TODO parse between quotes
           tokens.push(Token.new(TOKEN_QUOTE, nil))
           @position += 1
         elsif char == TOKEN_SLASH
@@ -64,7 +65,7 @@ module ComponentEmbeddedRuby
 
     def is_letter?(char)
       ascii = char.ord
-      (ascii >= 48 && ascii <= 57) || (ascii >= 65 && ascii <= 122)
+      (ascii >= 48 && ascii <= 57) || (ascii >= 65 && ascii <= 122) || ascii == 45 || ascii == 95
     end
   end
 end

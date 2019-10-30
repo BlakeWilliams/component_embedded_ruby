@@ -5,7 +5,7 @@ module ComponentEmbeddedRuby
     def test_that_it_lexes_basic_html
       lexer = Lexer.new("<html></html>")
 
-      assert_equal [
+      expected = [
         Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
         Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
         Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
@@ -13,7 +13,13 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
         Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
         Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
-      ], lexer.parse
+      ]
+
+      expected.zip(lexer.lex).each do |expected, received|
+        if expected != received
+          flunk "#{expected} != #{received}"
+        end
+      end
     end
 
     def test_that_it_parses_attributes
@@ -32,7 +38,37 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
         Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
         Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
-      ], lexer.parse
+      ], lexer.lex
+    end
+
+    def test_that_it_lexes_nested_html
+      lexer = Lexer.new("<html><p></p></html>")
+
+      expected = [
+        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
+        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
+        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+
+        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
+        Lexer::Token.new(Lexer::TOKEN_STRING, "p"),
+        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+
+        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
+        Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
+        Lexer::Token.new(Lexer::TOKEN_STRING, "p"),
+        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+
+        Lexer::Token.new(Lexer::TOKEN_OPEN_CARROT, nil),
+        Lexer::Token.new(Lexer::TOKEN_SLASH, nil),
+        Lexer::Token.new(Lexer::TOKEN_STRING, "html"),
+        Lexer::Token.new(Lexer::TOKEN_CLOSE_CARROT, nil),
+      ]
+
+      expected.zip(lexer.lex).each do |expected, received|
+        if expected != received
+          flunk "#{expected} != #{received}"
+        end
+      end
     end
   end
 end
