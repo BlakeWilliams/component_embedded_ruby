@@ -109,24 +109,10 @@ module ComponentEmbeddedRuby
         @position += 1
       end
 
-      # TODO remove and turn into quoted string type
-      if current_token.type != Lexer::TOKEN_QUOTE
-        raise "unexpected token, expected start quote"
-      else
-        @position += 1
-      end
-
       if current_token.type != Lexer::TOKEN_STRING
         raise "unexpected token, expected string"
       else
         value = current_token.value
-        @position += 1
-      end
-
-      # TODO remove and turn into quoted string type
-      if current_token.type != Lexer::TOKEN_QUOTE
-        raise "unexpected token, expected end quote"
-      else
         @position += 1
       end
 

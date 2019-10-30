@@ -30,8 +30,9 @@ module ComponentEmbeddedRuby
           @position += 1
         elsif char == TOKEN_QUOTE
           # TODO parse between quotes
-          tokens.push(Token.new(TOKEN_QUOTE, nil))
-          @position += 1
+          tokens.push(
+            Token.new(TOKEN_STRING, read_quoted_string)
+          )
         elsif char == TOKEN_SLASH
           tokens.push(Token.new(TOKEN_SLASH, nil))
           @position += 1
@@ -61,6 +62,28 @@ module ComponentEmbeddedRuby
       end
 
       string
+    end
+
+    def read_quoted_string
+      string = ""
+
+      # Get past initial "
+      @position += 1
+
+      while !unescaped_quote?
+        raise "unterminated string" if @position > @content.length
+        string += @content[@position]
+        @position += 1
+      end
+
+      # Get past last "
+      @position += 1
+
+      string
+    end
+
+    def unescaped_quote?
+      @content[@position] == "\"" && @content[@position -1] != "\\"
     end
 
     def is_letter?(char)
