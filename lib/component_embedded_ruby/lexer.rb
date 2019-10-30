@@ -29,6 +29,8 @@ module ComponentEmbeddedRuby
         elsif char == "/"
           tokens.push(Token.new(:slash, nil))
           @position += 1
+        elsif char == "{"
+          tokens.push(Token.new(:ruby, read_ruby_string))
         elsif tokens.last.type == :close_carrot && is_letter?(char)
           tokens.push(
             Token.new(:string, read_body_string)
@@ -90,6 +92,31 @@ module ComponentEmbeddedRuby
 
       string
     end
+
+    def read_ruby_string
+      inner_bracket_count = 0
+
+      string = ""
+
+      @position += 1
+
+      loop do
+        break if inner_bracket_count == 0 && @content[@position] == "}"
+        char = @content[@position]
+        string += char
+
+        if char == "{"
+          inner_bracket_count += 1
+        elsif char == "}"
+          inner_bracket_count -= 1
+        end
+
+        @position += 1
+      end
+
+      string
+    end
+
     def unescaped_quote?
       @content[@position] == "\"" && @content[@position -1] != "\\"
     end
