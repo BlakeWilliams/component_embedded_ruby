@@ -8,7 +8,7 @@ require "component_embedded_ruby/unexpected_token_error"
 module ComponentEmbeddedRuby
   class Error < StandardError; end
 
-  def self.template(content, binding)
-    Template.new(content, binding)
+  def self.template(content)
+    Template.new(content)
   end
 end

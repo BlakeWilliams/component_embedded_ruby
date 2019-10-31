@@ -12,12 +12,8 @@ class ComponentEmbeddedRubyTest < Minitest::Test
   end
 
   class Component
-    def initialize(attrs)
-      @attrs = attrs
-    end
-
-    def render(children)
-      "<div>" +
+    def render(attrs, children)
+      "<div data-capitalize=\"#{attrs[:capitalize]}\">" +
         "#{children.upcase}" +
       "</div>"
     end
@@ -31,21 +27,27 @@ class ComponentEmbeddedRubyTest < Minitest::Test
     binding_class = View.new
 
     template = ComponentEmbeddedRuby.template(
-      "<h1 id={id}>{content}</h1>",
-      binding_class
+      "<h1 id={id}>{content}</h1>"
     )
 
-    assert_equal '<h1 id="identifier">Hello world!</h1>', template.to_s
+    assert_equal '<h1 id="identifier">Hello world!</h1>', template.render(binding_class)
   end
 
   def test_it_renders_components
     binding_class = View.new
 
     template = ComponentEmbeddedRuby.template(
-      '<h1 id={id}><ComponentEmbeddedRubyTest::Component capitalize="true">hello world</ComponentEmbeddedRubyTest::Component></h1>',
-      binding_class
+      %(
+        <h1 id={id}>
+          <ComponentEmbeddedRubyTest::Component capitalize="true" id={id}>
+            {content}
+          </ComponentEmbeddedRubyTest::Component>
+        </h1>
+      )
     )
 
-    assert_equal '<h1 id="identifier"><div>HELLO WORLD</div></h1>', template.to_s
+    expected = "<h1 id=\"identifier\"><div data-capitalize=\"true\">HELLO WORLD!</div></h1>"
+
+    assert_equal expected, template.render(binding_class)
   end
 end
