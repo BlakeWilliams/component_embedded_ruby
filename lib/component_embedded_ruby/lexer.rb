@@ -136,7 +136,7 @@ module ComponentEmbeddedRuby
 
     def is_letter?(char)
       ascii = char.ord
-      (ascii >= 48 && ascii <= 57) || (ascii >= 65 && ascii <= 122) || ascii == 45 || ascii == 95
+      (ascii >= 48 && ascii <= 57) || (ascii >= 65 && ascii <= 122) || ascii == 45 || ascii == 95 || ascii == 58
     end
   end
 end
