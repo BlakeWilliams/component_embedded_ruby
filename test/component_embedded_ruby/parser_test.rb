@@ -73,6 +73,8 @@ module ComponentEmbeddedRuby
           }
         ]
       }
+
+      assert_equal expected, results
     end
 
     def test_it_parses_html_attributes
@@ -82,8 +84,29 @@ module ComponentEmbeddedRuby
       expected = {
         tag: "b",
         attributes: [{ key: "id", value: "rad" }],
+        children: [
+          {
+            tag: nil,
+            attributes: nil,
+            children: "Hello world"
+          }
+        ]
+      }
+
+      assert_equal expected, results
+    end
+
+    def test_parses_eval_attributes
+      lexer = Lexer.new('<b id={rad}></b>')
+      results = Parser.new(lexer.lex).parse
+
+      expected = {
+        tag: "b",
+        attributes: [{ key: "id", value: Eval.new("rad") }],
         children: []
       }
+
+      assert_equal expected, results
     end
   end
 end

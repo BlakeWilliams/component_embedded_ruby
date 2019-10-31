@@ -19,12 +19,21 @@ module ComponentEmbeddedRuby
       elsif current_token.type == :open_carrot && next_token.type != :slash
         parse_open_tag
       elsif current_token.type == :string
-        @position += 1
-        {
+        tag = {
           tag: nil,
           attributes: nil,
           children: current_token.value
-        }
+        }.tap do
+          @position += 1
+        end
+      elsif current_token.type == :ruby
+        tag = {
+          tag: nil,
+          attributes: nil,
+          children: Eval.new(current_token.value)
+        }.tap do
+          @position += 1
+        end
       else
         raise "Unexpected token" # TODO line numbers, custom exception
       end
@@ -40,7 +49,7 @@ module ComponentEmbeddedRuby
       end
 
       @position += 1
-      parse_attributes
+      attributes = parse_attributes
 
       children = []
       child = parse_tag
@@ -78,7 +87,7 @@ module ComponentEmbeddedRuby
 
       {
         tag: tag,
-        attributes: [],
+        attributes: attributes,
         children: children,
       }
     end
@@ -109,10 +118,14 @@ module ComponentEmbeddedRuby
         @position += 1
       end
 
-      if current_token.type != :string
+      if current_token.type != :string && current_token.type != :ruby
         raise "unexpected token, expected string"
       else
-        value = current_token.value
+        if current_token.type == :string
+          value = current_token.value
+        else
+          value = Eval.new(current_token.value)
+        end
         @position += 1
       end
 

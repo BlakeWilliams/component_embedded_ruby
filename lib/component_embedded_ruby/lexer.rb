@@ -90,7 +90,7 @@ module ComponentEmbeddedRuby
     def read_body_string
       string = ""
 
-      while current_token != "<"
+      while current_token != "<" && current_token != "{"
         raise "unterminated content" if @position > @content.length
         string += current_token
         @position += 1
