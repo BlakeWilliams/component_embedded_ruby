@@ -51,6 +51,60 @@ module ComponentEmbeddedRuby
       @position += 1
       attributes = parse_attributes
 
+      if current_token.type == :slash
+        @position += 1
+
+        if current_token.type != :close_carrot
+          raise UnexpectedTokenError.new(:close_carrot, current_token)
+        else
+          @position += 1
+        end
+
+        {
+          tag: tag,
+          attributes: attributes,
+          children: [],
+        }
+      else
+        @position += 1
+
+        children = parse_children
+
+        if current_token.type != :open_carrot
+          raise UnexpectedTokenError.new(:open_carrot, current_token)
+        else
+          @position += 1
+        end
+
+        if current_token.type != :slash
+          raise UnexpectedTokenError.new(:slash, current_token)
+        else
+          @position += 1
+        end
+
+        if current_token.type != :identifier
+          raise UnexpectedTokenError.new(:identifier, current_token)
+        elsif current_token.value != tag
+          raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
+        else
+          @position += 1
+        end
+
+        if current_token.type != :close_carrot
+          raise UnexpectedTokenError.new(:close_carrot, current_token)
+        else
+          @position += 1
+        end
+
+        {
+          tag: tag,
+          attributes: attributes,
+          children: children,
+        }
+      end
+    end
+
+    def parse_children
       children = []
       child = parse_tag
 
@@ -59,47 +113,15 @@ module ComponentEmbeddedRuby
         child = parse_tag
       end
 
-      if current_token.type != :open_carrot
-        raise UnexpectedTokenError.new(:open_carrot, current_token)
-      else
-        @position += 1
-      end
-
-      if current_token.type != :slash
-        raise UnexpectedTokenError.new(:slash, current_token)
-      else
-        @position += 1
-      end
-
-      if current_token.type != :identifier
-        raise UnexpectedTokenError.new(:identifier, current_token)
-      elsif current_token.value != tag
-        raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
-      else
-        @position += 1
-      end
-
-      if current_token.type != :close_carrot
-        raise UnexpectedTokenError.new(:close_carrot, current_token)
-      else
-        @position += 1
-      end
-
-      {
-        tag: tag,
-        attributes: attributes,
-        children: children,
-      }
+      children
     end
 
     def parse_attributes
       attributes = []
 
-      while current_token.type != :close_carrot
+      while current_token.type != :close_carrot && current_token.type != :slash
         attributes.push(parse_attribute)
       end
-
-      @position += 1
 
       attributes
     end

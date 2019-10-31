@@ -96,6 +96,25 @@ module ComponentEmbeddedRuby
       assert_equal expected, results
     end
 
+    def test_parses_self_closing_tags
+      lexer = Lexer.new('<div><img src="#"/></div>')
+      results = Parser.new(lexer.lex).parse
+
+      expected = {
+        tag: "div",
+        attributes: [],
+        children: [
+          {
+            tag: "img",
+            attributes: [{ key: "src", value: "#" }],
+            children: []
+          }
+        ]
+      }
+
+      assert_equal expected, results
+    end
+
     def test_parses_eval_attributes
       lexer = Lexer.new('<b id={rad}></b>')
       results = Parser.new(lexer.lex).parse
