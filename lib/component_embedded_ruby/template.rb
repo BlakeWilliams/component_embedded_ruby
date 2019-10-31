@@ -58,7 +58,7 @@ module ComponentEmbeddedRuby
     end
 
     def component_tag?(exp)
-      !!/[[:upper:]]/.match(exp[:tag][0])
+      exp[:tag] && !!/[[:upper:]]/.match(exp[:tag][0])
     end
 
     def component_class(exp)
