@@ -6,11 +6,14 @@ module ComponentEmbeddedRuby
     end
 
     def parse
-      if current_token.type == :open_carrot && peek_token.type == :slash
-        nil
-      elsif current_token.type == :open_carrot && peek_token.type != :slash
-        parse_tag
-      elsif current_token.type == :string
+      case current_token.type
+      when :open_carrot
+        if peek_token.type == :slash # close tag
+          nil
+        else
+          parse_tag # open tag
+        end
+      when :string
         tag = {
           tag: nil,
           attributes: nil,
@@ -18,7 +21,7 @@ module ComponentEmbeddedRuby
         }.tap do
           @position += 1
         end
-      elsif current_token.type == :ruby
+      when :ruby
         tag = {
           tag: nil,
           attributes: nil,
