@@ -167,5 +167,31 @@ module ComponentEmbeddedRuby
         end
       end
     end
+
+    def test_handles_strings_in_ruby
+      lexer = Lexer.new('<p name={{ "hello}" => "world" }.keys}>{"world!"}</p>')
+
+      expected = [
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:identifier, "p"),
+        Lexer::Token.new(:identifier, "name"),
+        Lexer::Token.new(:equals, nil),
+        Lexer::Token.new(:ruby, '{ "hello}" => "world" }.keys'),
+        Lexer::Token.new(:close_carrot, nil),
+
+        Lexer::Token.new(:ruby, '"world!"'),
+
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:identifier, "p"),
+        Lexer::Token.new(:close_carrot, nil),
+      ]
+
+      expected.zip(lexer.lex).each do |expected, received|
+        if expected != received
+          flunk "#{expected} != #{received}"
+        end
+      end
+    end
   end
 end

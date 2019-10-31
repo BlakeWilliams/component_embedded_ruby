@@ -98,23 +98,30 @@ module ComponentEmbeddedRuby
     end
 
     def read_ruby_string
+      inner_string_count = 0
       inner_bracket_count = 0
 
       string = ""
 
       @position += 1
 
+      previous_token = nil
+
       loop do
-        break if inner_bracket_count == 0 && current_token == "}"
+        break if inner_bracket_count == 0 && inner_string_count % 2 == 0 && current_token == "}"
         char = current_token
         string += char
 
-        if char == "{"
+        # TODO handle " and ' separately
+        if inner_string_count % 2 == 0 && char == "{"
           inner_bracket_count += 1
-        elsif char == "}"
+        elsif inner_string_count % 2 == 0 && char == "}"
           inner_bracket_count -= 1
+        elsif previous_token != "\\" && char == "\"" || char == "'"
+          inner_string_count -= 1
         end
 
+        previous_token = char
         @position += 1
       end
 
