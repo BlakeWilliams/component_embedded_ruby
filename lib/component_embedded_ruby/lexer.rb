@@ -31,14 +31,16 @@ module ComponentEmbeddedRuby
           @position += 1
         elsif char == "{"
           tokens.push(Token.new(:ruby, read_ruby_string))
-        elsif tokens.last.type == :close_carrot && is_letter?(char)
-          tokens.push(
-            Token.new(:string, read_body_string)
-          )
         elsif is_letter?(char)
-          tokens.push(
-            Token.new(:identifier, read_string)
-          )
+          if tokens.last.type == :close_carrot
+            tokens.push(
+              Token.new(:string, read_body_string)
+            )
+          else
+            tokens.push(
+              Token.new(:identifier, read_string)
+            )
+          end
         else
           @position += 1
         end

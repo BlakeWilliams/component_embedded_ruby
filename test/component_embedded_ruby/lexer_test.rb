@@ -193,5 +193,28 @@ module ComponentEmbeddedRuby
         end
       end
     end
+
+    def test_handles_newlines_in_markup
+      lexer = Lexer.new("<p>\nworld!</p>")
+
+      expected = [
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:identifier, "p"),
+        Lexer::Token.new(:close_carrot, nil),
+
+        Lexer::Token.new(:string, 'world!'),
+
+        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:identifier, "p"),
+        Lexer::Token.new(:close_carrot, nil),
+      ]
+
+      expected.zip(lexer.lex).each do |expected, received|
+        if expected != received
+          flunk "#{expected} != #{received}"
+        end
+      end
+    end
   end
 end
