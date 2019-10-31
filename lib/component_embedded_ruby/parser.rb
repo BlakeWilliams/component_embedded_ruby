@@ -6,18 +6,10 @@ module ComponentEmbeddedRuby
     end
 
     def parse
-      parse_tag
-    end
-
-    private
-
-    attr_reader :tokens
-
-    def parse_tag
-      if current_token.type == :open_carrot && next_token.type == :slash
+      if current_token.type == :open_carrot && peek_token.type == :slash
         nil
-      elsif current_token.type == :open_carrot && next_token.type != :slash
-        parse_open_tag
+      elsif current_token.type == :open_carrot && peek_token.type != :slash
+        parse_tag
       elsif current_token.type == :string
         tag = {
           tag: nil,
@@ -39,26 +31,19 @@ module ComponentEmbeddedRuby
       end
     end
 
-    def parse_open_tag
+    private
+
+    attr_reader :tokens
+
+    def parse_tag
       @position +=1 # already matching a <
 
-      if current_token.type != :identifier
-        raise UnexpectedTokenError.new(:identifier, current_token)
-      else
-        tag = current_token.value
-      end
-
-      @position += 1
+      tag = expect(:identifier).value
       attributes = parse_attributes
 
       if current_token.type == :slash
-        @position += 1
-
-        if current_token.type != :close_carrot
-          raise UnexpectedTokenError.new(:close_carrot, current_token)
-        else
-          @position += 1
-        end
+        expect(:slash)
+        expect(:close_carrot)
 
         {
           tag: tag,
@@ -66,35 +51,19 @@ module ComponentEmbeddedRuby
           children: [],
         }
       else
-        @position += 1
+        @position += 1 # TODO can this expect?
 
         children = parse_children
 
-        if current_token.type != :open_carrot
-          raise UnexpectedTokenError.new(:open_carrot, current_token)
-        else
-          @position += 1
-        end
+        expect(:open_carrot)
+        expect(:slash)
+        close_tag = expect(:identifier).value
 
-        if current_token.type != :slash
-          raise UnexpectedTokenError.new(:slash, current_token)
-        else
-          @position += 1
-        end
-
-        if current_token.type != :identifier
-          raise UnexpectedTokenError.new(:identifier, current_token)
-        elsif current_token.value != tag
+        if close_tag != tag
           raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
-        else
-          @position += 1
         end
 
-        if current_token.type != :close_carrot
-          raise UnexpectedTokenError.new(:close_carrot, current_token)
-        else
-          @position += 1
-        end
+        expect(:close_carrot)
 
         {
           tag: tag,
@@ -106,11 +75,11 @@ module ComponentEmbeddedRuby
 
     def parse_children
       children = []
-      child = parse_tag
+      child = parse
 
       while child != nil
         children.push(child)
-        child = parse_tag
+        child = parse
       end
 
       children
@@ -127,12 +96,7 @@ module ComponentEmbeddedRuby
     end
 
     def parse_attribute
-      if current_token.type != :identifier
-        raise UnexpectedTokenError.new(:identifier, current_token)
-      else
-        key = current_token.value
-        @position += 1
-      end
+      key = expect(:identifier).value
 
       if current_token.type != :equals
         raise UnexpectedTokenError.new(:equals, current_token)
@@ -140,15 +104,12 @@ module ComponentEmbeddedRuby
         @position += 1
       end
 
-      if current_token.type != :string && current_token.type != :ruby
-        raise UnexpectedTokenError.new(:string, current_token)
+      value_token = expect_any(:string, :ruby)
+
+      if value_token.type == :string
+        value = value_token.value
       else
-        if current_token.type == :string
-          value = current_token.value
-        else
-          value = Eval.new(current_token.value)
-        end
-        @position += 1
+        value = Eval.new(value_token.value)
       end
 
       { key: key, value: value }
@@ -158,8 +119,33 @@ module ComponentEmbeddedRuby
       tokens[@position]
     end
 
-    def next_token
+    def peek_token
       tokens[@position + 1]
+    end
+
+
+    def expect(type)
+      token = current_token
+
+      if token.type != type
+        raise UnexpectedTokenError.new(:string, current_token)
+      else
+        @position += 1
+      end
+
+      token
+    end
+
+    def expect_any(*types)
+      token = current_token
+
+      if !types.include?(token.type)
+        raise UnexpectedTokenError.new(:string, token)
+      else
+        @position += 1
+      end
+
+      token
     end
   end
 end
