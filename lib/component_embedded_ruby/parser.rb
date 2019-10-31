@@ -51,7 +51,7 @@ module ComponentEmbeddedRuby
           children: [],
         }
       else
-        @position += 1 # TODO can this expect?
+        expect(:close_carrot)
 
         children = parse_children
 
@@ -122,7 +122,6 @@ module ComponentEmbeddedRuby
     def peek_token
       tokens[@position + 1]
     end
-
 
     def expect(type)
       token = current_token
