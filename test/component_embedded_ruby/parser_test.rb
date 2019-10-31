@@ -108,5 +108,21 @@ module ComponentEmbeddedRuby
 
       assert_equal expected, results
     end
+
+    def test_unexpected_token_raises
+      lexer = Lexer.new('<b</b>')
+
+      expected = {
+        tag: "b",
+        attributes: [{ key: "id", value: Eval.new("rad") }],
+        children: []
+      }
+
+      assert_raises UnexpectedTokenError do |error|
+        Parser.new(lexer.lex).parse
+
+        assert_equal "Unexpected token at column 2, got < but expected identifier", error.message
+      end
+    end
   end
 end

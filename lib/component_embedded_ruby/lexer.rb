@@ -1,58 +1,58 @@
 module ComponentEmbeddedRuby
   class Lexer
-    Token = Struct.new(:type, :value)
+    Token = Struct.new(:type, :value, :position)
 
     def initialize(content)
       @content = content.freeze
       @position = 0
+      @tokens = []
+      @last_token = nil
     end
 
     def lex
-      tokens = []
-
       while position != @content.length
         char = content[@position]
 
         if char == "<"
-          tokens.push(Token.new(:open_carrot, nil))
+          add_token(:open_carrot, "<")
           @position += 1
         elsif char == ">"
-          tokens.push(Token.new(:close_carrot, nil))
+          add_token(:close_carrot, ">")
           @position += 1
         elsif char == "="
-          tokens.push(Token.new(:equals, nil))
+          add_token(:equals, "=")
           @position += 1
         elsif char == "\""
-          tokens.push(
-            Token.new(:string, read_quoted_string)
-          )
+          add_token(:string, read_quoted_string)
         elsif char == "/"
-          tokens.push(Token.new(:slash, nil))
+          add_token(:slash, "/")
           @position += 1
         elsif char == "{"
-          tokens.push(Token.new(:ruby, read_ruby_string))
+          add_token(:ruby, read_ruby_string)
         elsif is_letter?(char)
-          if tokens.last.type == :close_carrot
-            tokens.push(
-              Token.new(:string, read_body_string)
-            )
+          if @last_token&.type == :close_carrot
+            add_token(:string, read_body_string)
           else
-            tokens.push(
-              Token.new(:identifier, read_string)
-            )
+            add_token(:identifier, read_string)
           end
         else
           @position += 1
         end
       end
 
-      tokens
+      @tokens
     end
 
     private
 
     attr_reader :content
     attr_accessor :position
+
+    def add_token(type, value)
+      token = Token.new(type, value, @position)
+      @last_token = token
+      @tokens << token
+    end
 
     def current_token
       content[@position]

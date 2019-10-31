@@ -6,26 +6,22 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("<html></html>")
 
       expected = [
-        Lexer::Token.new(:open_carrot, nil),
+        Lexer::Token.new(:open_carrot, "<"),
         Lexer::Token.new(:identifier, "html"),
-        Lexer::Token.new(:close_carrot, nil),
-        Lexer::Token.new(:open_carrot, nil),
-        Lexer::Token.new(:slash, nil),
+        Lexer::Token.new(:close_carrot, ">"),
+        Lexer::Token.new(:open_carrot, "<"),
+        Lexer::Token.new(:slash, "/"),
         Lexer::Token.new(:identifier, "html"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, ">"),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_that_it_parses_attributes
       lexer = Lexer.new('<html id="main"></html>')
 
-      assert_equal [
+      expected = [
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:identifier, "html"),
         Lexer::Token.new(:identifier, "id"),
@@ -36,7 +32,9 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "html"),
         Lexer::Token.new(:close_carrot, nil),
-      ], lexer.lex
+      ]
+
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_that_it_lexes_nested_html
@@ -62,11 +60,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_that_it_parses_quotes_correctly
@@ -86,11 +80,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_text_is_parsed_correctly
@@ -109,11 +99,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_ruby_is_parsed_correctly
@@ -135,11 +121,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_ruby_is_parsed_correctly_with_inner_hash
@@ -161,11 +143,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_handles_strings_in_ruby
@@ -187,11 +165,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_handles_ruby_in_body_strings
@@ -211,11 +185,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
-          flunk "#{expected} != #{received}"
-        end
-      end
+      assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_handles_newlines_in_markup
@@ -234,8 +204,16 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:close_carrot, nil),
       ]
 
-      expected.zip(lexer.lex).each do |expected, received|
-        if expected != received
+      assert_types_and_values_equal expected, lexer.lex
+    end
+
+    def assert_types_and_values_equal(expected, received)
+      expected.zip(received).each do |expected, received|
+        if expected.type != received.type
+          flunk "#{expected} != #{received}"
+        end
+
+        if expected.value != received.value && (expected.type == :string || expected.type == :identifier || expected.type == :ruby)
           flunk "#{expected} != #{received}"
         end
       end

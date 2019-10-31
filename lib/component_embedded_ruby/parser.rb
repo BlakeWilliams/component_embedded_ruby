@@ -35,7 +35,7 @@ module ComponentEmbeddedRuby
           @position += 1
         end
       else
-        raise "Unexpected token" # TODO line numbers, custom exception
+        raise UnexpectedTokenError.new(nil, current_token)
       end
     end
 
@@ -43,7 +43,7 @@ module ComponentEmbeddedRuby
       @position +=1 # already matching a <
 
       if current_token.type != :identifier
-        raise "Unexpected token, expected string"
+        raise UnexpectedTokenError.new(:identifier, current_token)
       else
         tag = current_token.value
       end
@@ -60,19 +60,19 @@ module ComponentEmbeddedRuby
       end
 
       if current_token.type != :open_carrot
-        raise "Unexpected token, expected <"
+        raise UnexpectedTokenError.new(:open_carrot, current_token)
       else
         @position += 1
       end
 
       if current_token.type != :slash
-        raise "Unexpected token, expected /"
+        raise UnexpectedTokenError.new(:slash, current_token)
       else
         @position += 1
       end
 
       if current_token.type != :identifier
-        raise "Unexpected token, expected closing string"
+        raise UnexpectedTokenError.new(:identifier, current_token)
       elsif current_token.value != tag
         raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
       else
@@ -80,7 +80,7 @@ module ComponentEmbeddedRuby
       end
 
       if current_token.type != :close_carrot
-        raise "Unexpected token, expected >"
+        raise UnexpectedTokenError.new(:close_carrot, current_token)
       else
         @position += 1
       end
@@ -106,20 +106,20 @@ module ComponentEmbeddedRuby
 
     def parse_attribute
       if current_token.type != :identifier
-        raise "unexpected token, expected string"
+        raise UnexpectedTokenError.new(:identifier, current_token)
       else
         key = current_token.value
         @position += 1
       end
 
       if current_token.type != :equals
-        raise "unexpected token, expected equals"
+        raise UnexpectedTokenError.new(:equals, current_token)
       else
         @position += 1
       end
 
       if current_token.type != :string && current_token.type != :ruby
-        raise "unexpected token, expected string"
+        raise UnexpectedTokenError.new(:string, current_token)
       else
         if current_token.type == :string
           value = current_token.value
