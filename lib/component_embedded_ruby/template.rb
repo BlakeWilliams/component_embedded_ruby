@@ -43,13 +43,13 @@ module ComponentEmbeddedRuby
     def render_component(node)
       @func << " + #{node.component_class}.new().render({"
 
-      @func << (node.attributes.map do |attr|
-        key = " :\"#{attr[:key]}\" => "
+      @func << (node.attributes.map do |key, value|
+        key = " :\"#{key}\" => "
 
-        value = if attr[:value].is_a?(Eval)
-          "#{attr[:value].value}"
+        value = if value.is_a?(Eval)
+          "#{value.value}"
         else
-          "\"#{attr[:value]}\""
+          "\"#{value}\""
         end
 
         key + value
@@ -83,10 +83,7 @@ module ComponentEmbeddedRuby
     end
 
     def render_attributes(node)
-      node.attributes.map do |pair|
-        key = pair[:key]
-        value = pair[:value]
-
+      node.attributes.map do |key, value|
         if value.is_a?(Eval)
           push_string(" #{key}=\"")
           push_eval(value.value)

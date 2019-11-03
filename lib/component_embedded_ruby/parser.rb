@@ -75,10 +75,10 @@ module ComponentEmbeddedRuby
     end
 
     def parse_attributes
-      attributes = []
+      attributes = {}
 
       while current_token.type != :close_carrot && current_token.type != :slash
-        attributes.push(parse_attribute)
+        attributes.merge!(parse_attribute)
       end
 
       attributes
@@ -101,7 +101,7 @@ module ComponentEmbeddedRuby
         value = Eval.new(value_token.value)
       end
 
-      { key: key, value: value }
+      { key => value }
     end
 
     def current_token

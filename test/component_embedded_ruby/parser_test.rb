@@ -8,7 +8,7 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "html",
-        [],
+        {},
         []
       )
 
@@ -21,9 +21,9 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "html",
-        [],
+        {},
         [
-          Node.new("p", [], [])
+          Node.new("p", {}, [])
         ]
       )
 
@@ -36,10 +36,10 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "html",
-        [],
+        {},
         [
-          Node.new("p", [], []),
-          Node.new("b", [], []),
+          Node.new("p", {}, []),
+          Node.new("b", {}, []),
         ]
       )
 
@@ -52,7 +52,7 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "b",
-        [],
+        {},
         [
           Node.new(nil, nil, "Hello world")
         ]
@@ -67,7 +67,7 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "b",
-        [{ key: "id", value: "rad" }],
+        { "id" => "rad" },
         [
           Node.new(nil, nil, "Hello world")
         ]
@@ -82,9 +82,9 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "div",
-        [],
+        {},
         [
-          Node.new("img", [{ key: "src", value: "#" }], [])
+          Node.new("img", { "src" => "#" }, [])
         ]
       )
 
@@ -97,7 +97,7 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "b",
-        [{ key: "id", value: Eval.new("rad") }],
+        { "id" => Eval.new("rad") },
         []
       )
 
@@ -109,7 +109,7 @@ module ComponentEmbeddedRuby
 
       expected = Node.new(
         "b",
-        [{ key: "id", value: Eval.new("rad") }],
+        { "id" => Eval.new("rad") },
         []
       )
 
