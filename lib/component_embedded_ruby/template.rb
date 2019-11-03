@@ -32,18 +32,18 @@ module ComponentEmbeddedRuby
       @func << "+ (#{to_eval}).to_s"
     end
 
-    def render_tree(exp)
-      if component_tag?(exp)
-        render_component(exp)
+    def render_tree(node)
+      if node.component?
+        render_component(node)
       else
-        render_tag(exp)
+        render_tag(node)
       end
     end
 
-    def render_component(exp)
-      @func << " + #{component_class(exp)}.new().render({"
+    def render_component(node)
+      @func << " + #{node.component_class}.new().render({"
 
-      @func << (exp[:attributes].map do |attr|
+      @func << (node.attributes.map do |attr|
         key = " :\"#{attr[:key]}\" => "
 
         value = if attr[:value].is_a?(Eval)
@@ -57,14 +57,14 @@ module ComponentEmbeddedRuby
 
       @func << "}, ''"
 
-      exp[:children].map(&method(:render_tag)).join("")
+      node.children.map(&method(:render_tag)).join("")
 
       @func << ')'
     end
 
-    def render_tag(exp)
-      if exp[:tag].nil?
-        content = exp[:children]
+    def render_tag(node)
+      if node.tag.nil?
+        content = node.children
 
         if content.is_a?(Eval)
           push_eval(content.value)
@@ -72,18 +72,18 @@ module ComponentEmbeddedRuby
           push_string(content)
         end
       else
-        push_string("<#{exp[:tag]}")
-        render_attributes(exp)
+        push_string("<#{node.tag}")
+        render_attributes(node)
         push_string(">")
 
-        exp[:children].map(&method(:render_tree))
+        node.children.map(&method(:render_tree))
 
-        push_string("</#{exp[:tag]}>")
+        push_string("</#{node.tag}>")
       end
     end
 
-    def render_attributes(exp)
-      exp[:attributes].map do |pair|
+    def render_attributes(node)
+      node.attributes.map do |pair|
         key = pair[:key]
         value = pair[:value]
 
@@ -95,14 +95,6 @@ module ComponentEmbeddedRuby
           push_string(" #{key}=\"#{value}\"")
         end
       end
-    end
-
-    def component_tag?(exp)
-      exp[:tag] && !!/[[:upper:]]/.match(exp[:tag][0])
-    end
-
-    def component_class(exp)
-      Object.const_get(exp[:tag])
     end
   end
 end

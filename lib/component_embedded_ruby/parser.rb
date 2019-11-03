@@ -14,19 +14,13 @@ module ComponentEmbeddedRuby
           parse_tag # open tag
         end
       when :string
-        tag = {
-          tag: nil,
-          attributes: nil,
-          children: current_token.value
-        }.tap do
+        Node.new(nil, nil, current_token.value).tap do
           @position += 1
         end
-      when :ruby
-        tag = {
-          tag: nil,
-          attributes: nil,
-          children: Eval.new(current_token.value)
-        }.tap do
+      when :ruby, :ruby_no_eval
+        value = Eval.new(current_token.value, output: current_token.type == :ruby)
+
+        Node.new(nil, nil, value).tap do
           @position += 1
         end
       else
@@ -48,11 +42,7 @@ module ComponentEmbeddedRuby
         expect(:slash)
         expect(:close_carrot)
 
-        {
-          tag: tag,
-          attributes: attributes,
-          children: [],
-        }
+        Node.new(tag, attributes, [])
       else
         expect(:close_carrot)
 
@@ -68,11 +58,7 @@ module ComponentEmbeddedRuby
 
         expect(:close_carrot)
 
-        {
-          tag: tag,
-          attributes: attributes,
-          children: children,
-        }
+        Node.new(tag, attributes, children)
       end
     end
 

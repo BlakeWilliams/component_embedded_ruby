@@ -6,11 +6,11 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("<html></html>")
       results = Parser.new(lexer.lex).parse
 
-      expected = {
-        tag: "html",
-        attributes: [],
-        children: []
-      }
+      expected = Node.new(
+        "html",
+        [],
+        []
+      )
 
       assert_equal expected, results
     end
@@ -19,17 +19,13 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("<html><p></p></html>")
       results = Parser.new(lexer.lex).parse
 
-      expected = {
-        tag: "html",
-        attributes: [],
-        children: [
-          {
-            tag: "p",
-            attributes: [],
-            children: []
-          }
+      expected = Node.new(
+        "html",
+        [],
+        [
+          Node.new("p", [], [])
         ]
-      }
+      )
 
       assert_equal expected, results
     end
@@ -38,22 +34,14 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("<html><p></p><b></b></html>")
       results = Parser.new(lexer.lex).parse
 
-      expected = {
-        tag: "html",
-        attributes: [],
-        children: [
-          {
-            tag: "p",
-            attributes: [],
-            children: []
-          },
-          {
-            tag: "b",
-            attributes: [],
-            children: []
-          }
+      expected = Node.new(
+        "html",
+        [],
+        [
+          Node.new("p", [], []),
+          Node.new("b", [], []),
         ]
-      }
+      )
 
       assert_equal expected, results
     end
@@ -62,17 +50,13 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("<b>Hello world</b>")
       results = Parser.new(lexer.lex).parse
 
-      expected = {
-        tag: "b",
-        attributes: [],
-        children: [
-          {
-            tag: nil,
-            attributes: nil,
-            children: "Hello world"
-          }
+      expected = Node.new(
+        "b",
+        [],
+        [
+          Node.new(nil, nil, "Hello world")
         ]
-      }
+      )
 
       assert_equal expected, results
     end
@@ -81,17 +65,13 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new('<b id="rad">Hello world</b>')
       results = Parser.new(lexer.lex).parse
 
-      expected = {
-        tag: "b",
-        attributes: [{ key: "id", value: "rad" }],
-        children: [
-          {
-            tag: nil,
-            attributes: nil,
-            children: "Hello world"
-          }
+      expected = Node.new(
+        "b",
+        [{ key: "id", value: "rad" }],
+        [
+          Node.new(nil, nil, "Hello world")
         ]
-      }
+      )
 
       assert_equal expected, results
     end
@@ -100,17 +80,13 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new('<div><img src="#"/></div>')
       results = Parser.new(lexer.lex).parse
 
-      expected = {
-        tag: "div",
-        attributes: [],
-        children: [
-          {
-            tag: "img",
-            attributes: [{ key: "src", value: "#" }],
-            children: []
-          }
+      expected = Node.new(
+        "div",
+        [],
+        [
+          Node.new("img", [{ key: "src", value: "#" }], [])
         ]
-      }
+      )
 
       assert_equal expected, results
     end
@@ -119,11 +95,11 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new('<b id={rad}></b>')
       results = Parser.new(lexer.lex).parse
 
-      expected = {
-        tag: "b",
-        attributes: [{ key: "id", value: Eval.new("rad") }],
-        children: []
-      }
+      expected = Node.new(
+        "b",
+        [{ key: "id", value: Eval.new("rad") }],
+        []
+      )
 
       assert_equal expected, results
     end
@@ -131,11 +107,11 @@ module ComponentEmbeddedRuby
     def test_unexpected_token_raises
       lexer = Lexer.new('<b</b>')
 
-      expected = {
-        tag: "b",
-        attributes: [{ key: "id", value: Eval.new("rad") }],
-        children: []
-      }
+      expected = Node.new(
+        "b",
+        [{ key: "id", value: Eval.new("rad") }],
+        []
+      )
 
       assert_raises UnexpectedTokenError do |error|
         Parser.new(lexer.lex).parse
