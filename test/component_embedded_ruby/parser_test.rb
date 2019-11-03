@@ -12,6 +12,18 @@ module ComponentEmbeddedRuby
         []
       )
 
+      assert_equal expected, results.first
+    end
+
+    def test_parses_multiple_children
+      lexer = Lexer.new("<header></header><footer></footer>")
+      results = Parser.new(lexer.lex).parse
+
+      expected = [
+        Node.new("header", {}, []),
+        Node.new("footer", {}, [])
+      ]
+
       assert_equal expected, results
     end
 
@@ -27,7 +39,7 @@ module ComponentEmbeddedRuby
         ]
       )
 
-      assert_equal expected, results
+      assert_equal expected, results.first
     end
 
     def test_it_parses_adjacent_html
@@ -43,7 +55,7 @@ module ComponentEmbeddedRuby
         ]
       )
 
-      assert_equal expected, results
+      assert_equal expected, results.first
     end
 
     def test_it_parses_string_content_as_children
@@ -58,7 +70,7 @@ module ComponentEmbeddedRuby
         ]
       )
 
-      assert_equal expected, results
+      assert_equal expected, results.first
     end
 
     def test_it_parses_html_attributes
@@ -73,7 +85,7 @@ module ComponentEmbeddedRuby
         ]
       )
 
-      assert_equal expected, results
+      assert_equal expected, results.first
     end
 
     def test_parses_self_closing_tags
@@ -88,7 +100,7 @@ module ComponentEmbeddedRuby
         ]
       )
 
-      assert_equal expected, results
+      assert_equal expected, results.first
     end
 
     def test_parses_eval_attributes
@@ -101,7 +113,7 @@ module ComponentEmbeddedRuby
         []
       )
 
-      assert_equal expected, results
+      assert_equal expected, results.first
     end
 
     def test_unexpected_token_raises

@@ -28,7 +28,12 @@ module ComponentEmbeddedRuby
           add_token(:slash, "/")
           @position += 1
         elsif char == "{"
-          add_token(:ruby, read_ruby_string)
+          if next_token == "-"
+            @position += 1
+            add_token(:ruby_no_eval, read_ruby_string)
+          else
+            add_token(:ruby, read_ruby_string)
+          end
         elsif is_letter?(char)
           if @last_token&.type == :close_carrot
             add_token(:string, read_body_string)
@@ -56,6 +61,10 @@ module ComponentEmbeddedRuby
 
     def current_token
       content[@position]
+    end
+
+    def next_token
+      content[@position + 1]
     end
 
     def read_string

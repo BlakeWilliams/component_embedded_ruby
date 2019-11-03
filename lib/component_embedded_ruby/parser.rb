@@ -5,27 +5,40 @@ module ComponentEmbeddedRuby
       @position = 0
     end
 
-    def parse
-      case current_token.type
-      when :open_carrot
-        if peek_token.type == :slash # close tag
-          nil
-        else
-          parse_tag # open tag
-        end
-      when :string
-        Node.new(nil, nil, current_token.value).tap do
-          @position += 1
-        end
-      when :ruby, :ruby_no_eval
-        value = Eval.new(current_token.value, output: current_token.type == :ruby)
+    def parse(inside_tag: false)
+      results = []
 
-        Node.new(nil, nil, value).tap do
-          @position += 1
+      while current_token
+        case current_token.type
+        when :open_carrot
+          if next_token.type == :slash # close tag
+            if inside_tag
+              return results
+            else
+              nil
+            end
+          else
+            results << parse_tag
+          end
+        when :string, :identifier
+            results << Node.new(nil, nil, current_token.value).tap do
+            @position += 1
+          end
+        when :ruby, :ruby_no_eval
+          value = Eval.new(current_token.value, output: current_token.type == :ruby)
+
+          results << Node.new(nil, nil, value).tap do
+            @position += 1
+          end
+        else
+          if inside_tag
+            return results
+            raise UnexpectedTokenError.new(nil, current_token)
+          end
         end
-      else
-        raise UnexpectedTokenError.new(nil, current_token)
       end
+
+      results
     end
 
     private
@@ -63,15 +76,7 @@ module ComponentEmbeddedRuby
     end
 
     def parse_children
-      children = []
-      child = parse
-
-      while child != nil
-        children.push(child)
-        child = parse
-      end
-
-      children
+      children = parse(inside_tag: true)
     end
 
     def parse_attributes
@@ -108,7 +113,7 @@ module ComponentEmbeddedRuby
       tokens[@position]
     end
 
-    def peek_token
+    def next_token
       tokens[@position + 1]
     end
 

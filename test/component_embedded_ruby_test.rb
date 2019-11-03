@@ -9,6 +9,10 @@ class ComponentEmbeddedRubyTest < Minitest::Test
     def content
       "Hello world!"
     end
+
+    def get_binding
+      binding
+    end
   end
 
   class Component
@@ -24,30 +28,94 @@ class ComponentEmbeddedRubyTest < Minitest::Test
   end
 
   def test_it_converts_to_html
-    binding_class = View.new
-
-    template = ComponentEmbeddedRuby.template(
-      "<h1 id={id}>{content}</h1>"
+    result = ComponentEmbeddedRuby.render(
+      "<h1 id={id}>{content}</h1>",
+      binding: View.new.get_binding
     )
 
-    assert_equal '<h1 id="identifier">Hello world!</h1>', template.render(binding_class)
+    assert_equal '<h1 id="identifier">Hello world!</h1>', result
   end
 
   def test_it_renders_components
     binding_class = View.new
 
-    template = ComponentEmbeddedRuby.template(
+    result = ComponentEmbeddedRuby.render(
       %(
         <h1 id={id}>
           <ComponentEmbeddedRubyTest::Component capitalize="true" id={id}>
             {content}
           </ComponentEmbeddedRubyTest::Component>
         </h1>
-      )
+      ),
+      binding: binding_class.get_binding
     )
 
     expected = "<h1 id=\"identifier\"><div data-capitalize=\"true\">HELLO WORLD!</div></h1>"
 
-    assert_equal expected, template.render(binding_class)
+    assert_equal expected, result
+  end
+
+
+  def test_handles_if_statements
+    binding_class = View.new
+
+    result = ComponentEmbeddedRuby.render(
+      %(
+        <h1 id={id}>
+          {- if 1 > 0}
+            hello
+          {- else }
+            wat
+          {- end }
+        </h1>
+      ),
+      binding: binding_class.get_binding
+    )
+
+    expected = "<h1 id=\"identifier\">hello</h1>"
+
+    assert_equal expected, result
+  end
+
+  def test_handles_top_level_escaped_ruby
+    binding_class = View.new
+
+    result = ComponentEmbeddedRuby.render(
+      %(
+        {- if false }
+          hello
+        {- else }
+          wat
+        {- end }
+      ),
+      binding: binding_class.get_binding
+    )
+
+    expected = "wat"
+
+    assert_equal expected, result
+  end
+
+  def test_handles_if_statements_in_components
+    binding_class = View.new
+
+    result = ComponentEmbeddedRuby.render(
+      %(
+        <h1 id={id}>
+          <ComponentEmbeddedRubyTest::Component capitalize="true" id={id}>
+            {- if 1 > 0}
+              {content}
+            {- else }
+              wat
+            {- end }
+          </ComponentEmbeddedRubyTest::Component>
+        </h1>
+      ),
+      binding: binding_class.get_binding
+    )
+
+    expected = "<h1 id=\"identifier\"><div data-capitalize=\"true\">HELLO WORLD!</div></h1>"
+
+    assert_equal expected, result
   end
 end

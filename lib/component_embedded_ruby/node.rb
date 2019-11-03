@@ -16,6 +16,10 @@ module ComponentEmbeddedRuby
       end
     end
 
+    def unique_id
+      "#{tag.hash}-#{attributes.hash}-#{children.hash}".gsub("-", "_")
+    end
+
     def component_class
       @_component_class = Object.const_get(tag)
     end
@@ -23,6 +27,22 @@ module ComponentEmbeddedRuby
     # If the tag starts with a capital, we assume it's a component
     def component?
       @_component ||= tag && !!/[[:upper:]]/.match(tag[0])
+    end
+
+    def ruby?
+      children.is_a?(Eval)
+    end
+
+    def output_ruby?
+      ruby? && children.output
+    end
+
+    def text?
+      tag.nil? && !ruby?
+    end
+
+    def html?
+      !component? && tag
     end
   end
 end
