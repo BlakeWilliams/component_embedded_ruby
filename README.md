@@ -1,34 +1,50 @@
 # Component Embedded Ruby
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/component_embedded_ruby`. To experiment with that code, run `bin/console` for an interactive prompt.
+Strict HTML templating with support for components.
 
-TODO: Delete this and the text above, and describe your gem
+### Features:
 
-## Installation
+* Strict HTML parsing. eg: matching end tags are enforced
+* HTML attributes are either static, or dynamic. No more `class="hello <%=
+    extra_classes %>`
+* Component rendering based on a simple interface
 
-Add this line to your application's Gemfile:
+### Usage
+
+Define a template:
 
 ```ruby
-gem 'component_embedded_ruby'
+<h1>
+  <Capitalization upcase={true}>hello world</Capitalization>
+</h1>
 ```
 
-And then execute:
+Define a component
 
-    $ bundle
+```ruby
+class Capitalization
+  def render(attrs, children)
+    if attrs[:upcase]
+      children.upcase
+    else
+      children
+    end
+  end
+end
+```
 
-Or install it yourself as:
+Render it
 
-    $ gem install component_embedded_ruby
+```ruby
+ComponentEmbeddedRuby.render(template_string)
+```
 
-## Usage
+See results
 
-TODO: Write usage instructions here
 
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```html
+<h1>HELLO WORLD</h1>
+```
 
 ## Contributing
 
