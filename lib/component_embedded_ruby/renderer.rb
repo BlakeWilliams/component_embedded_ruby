@@ -16,14 +16,20 @@ module ComponentEmbeddedRuby
 
         #{nodes.map(&method(:render)).join("\n")}
 
-        #{output_var_name}\n
+        #{output_var_name};
       EOF
     end
 
+    private
+
     def render(node)
       if node.component?
-        child_output = self.class.new(node.children, output_var_name: "__c_#{node.hash.to_s.gsub("-", "_")}").to_ruby
-        "#{child_output}\n #{output_var_name}.<< #{node.component_class}.new.render({ #{attributes_for_component(node).join(",")} }, __c_#{node.hash.to_s.gsub("-", "_")});\n"
+        <<~EOF
+          #{children_to_ruby(node)}
+          #{output_var_name}.<< #{node.component_class}.new.render(
+            { #{attributes_for_component(node).join(",")} }, __c_#{node.hash.to_s.gsub("-", "_")}
+          );
+        EOF
       elsif node.ruby?
         if node.output_ruby?
           "#{output_var_name}.<< (#{node.children.value}).to_s;\n"
@@ -33,17 +39,24 @@ module ComponentEmbeddedRuby
       elsif node.text?
         "#{output_var_name}.<< \"#{node.children}\";\n"
       elsif node.html?
-        "#{output_var_name}.<< \"<#{node.tag}\";\n" +
-          attributes_for_tag(node).join("\n") +
-          "#{output_var_name}.<< \">\";\n" +
-          node.children.map(&method(:render)).join("\n") +
-          "#{output_var_name}.<< \"</#{node.tag}>\""
+        <<~EOF
+          #{output_var_name}.<< \"<#{node.tag}\";
+          #{attributes_for_tag(node).join("\n")};
+          #{output_var_name}.<< \">\";
+          #{node.children.map(&method(:render)).join("\n")}
+          #{output_var_name}.<< \"</#{node.tag}>\";
+        EOF
       end
     end
 
-    private
-
     attr_reader :output_var_name
+
+    def children_to_ruby(node)
+      self.class.new(
+        node.children,
+        output_var_name: "__c_#{node.hash.to_s.gsub("-", "_")}"
+      ).to_ruby
+    end
 
     def attributes_for_component(node)
       node.attributes.map do |key, value|

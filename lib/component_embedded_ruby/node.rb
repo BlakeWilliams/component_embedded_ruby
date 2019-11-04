@@ -16,10 +16,6 @@ module ComponentEmbeddedRuby
       end
     end
 
-    def unique_id
-      "#{tag.hash}-#{attributes.hash}-#{children.hash}".gsub("-", "_")
-    end
-
     def component_class
       @_component_class = Object.const_get(tag)
     end
