@@ -15,10 +15,20 @@ class ComponentEmbeddedRubyTest < Minitest::Test
     end
   end
 
-  class Component
-    def render(attrs, children)
-      "<div data-capitalize=\"#{attrs[:capitalize]}\">" +
-        "#{children.upcase}" +
+  class Component < ViewComponent::Base
+    attr_reader :attributes
+
+    def initialize(capitalize:, id: nil)
+      @capitalize = capitalize
+      @id = id
+    end
+
+    # override render_in because crb doesn't care about view context yet
+    def render_in
+      content = block_given? ? yield(self) : ""
+
+      "<div data-capitalize=\"#{@capitalize}\">" +
+        "#{content.upcase}" +
       "</div>"
     end
   end

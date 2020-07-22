@@ -2,14 +2,25 @@ require "test_helper"
 
 module ComponentEmbeddedRuby
   class RendererTest < Minitest::Test
-    class Component
-      def render(attrs, children)
-        children + " #{attrs[:name]}"
+    class Component < ViewComponent::Base
+      def initialize(name:)
+        @name = name
       end
+
+      def render_in
+        children = block_given? ? yield(self) : ""
+
+        children + " #{name}"
+      end
+
+      private
+      attr_reader :name
     end
 
-    class SpanComponent
-      def render(attrs, children)
+    class SpanComponent < ViewComponent::Base
+      def render_in
+        children = block_given? ? yield(self) : ""
+
         "<span>" + children + "</span>"
       end
     end
