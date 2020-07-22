@@ -23,8 +23,14 @@ Define a component
 
 ```ruby
 class Capitalization
-  def render(attrs, children)
-    if attrs[:upcase]
+  def initialize(upcase: false)
+    @upcase = upcase
+  end
+
+  def render_in
+    children = yield
+
+    if @upcase
       children.upcase
     else
       children
