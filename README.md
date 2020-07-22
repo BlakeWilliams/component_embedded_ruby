@@ -6,8 +6,10 @@ Strict HTML templating with support for components.
 
 * Strict HTML parsing. eg: matching end tags are enforced
 * HTML attributes are either static, or dynamic. No more `class="hello <%=
-    extra_classes %>`
-* Component rendering based on a simple interface
+    extra_classes %>`, instead this logic should be pushed up to components.
+* Component rendering has a single dependency, a `render` method being present
+  in the rendering context.
+* Easy Rails integration by registering `crb` as a template handler.
 
 ### Usage
 
@@ -23,8 +25,14 @@ Define a component
 
 ```ruby
 class Capitalization
-  def render(attrs, children)
-    if attrs[:upcase]
+  def initialize(upcase: false)
+    @upcase = upcase
+  end
+
+  def render_in(_view_context)
+    children = yield
+
+    if @upcase
       children.upcase
     else
       children
@@ -45,6 +53,23 @@ See results
 ```html
 <h1>HELLO WORLD</h1>
 ```
+
+If trying to render outside of a Rails environment, ensure that the binding
+passed to the renderer has a top-level `render` method that can accept component
+instances and convert them to strings.
+
+
+e.g. the most basic example could look like this:
+
+```ruby
+def render(renderable, &block)
+  # This assumes components being rendered utilize `to_s` to render their
+  # templates
+  renderable.to_s(&nlock)
+end
+```
+
+For more examples, check out the `ComponentEmbeddedRuby::Renderable` tests.
 
 ## Contributing
 

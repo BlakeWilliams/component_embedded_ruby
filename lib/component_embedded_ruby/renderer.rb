@@ -26,9 +26,9 @@ module ComponentEmbeddedRuby
       if node.component?
         <<~EOF
           #{children_to_ruby(node)}
-          #{output_var_name}.<< #{node.component_class}.new.render(
-            { #{attributes_for_component(node).join(",")} }, __c_#{node.hash.to_s.gsub("-", "_")}
-          );
+          #{output_var_name}.<< render(#{node.component_class}.new(#{attributes_for_component(node).join(",")})) { |component|
+             __c_#{node.hash.to_s.gsub("-", "_")}
+          };
         EOF
       elsif node.ruby?
         if node.output_ruby?
@@ -61,9 +61,9 @@ module ComponentEmbeddedRuby
     def attributes_for_component(node)
       node.attributes.map do |key, value|
         if value.is_a?(Eval)
-          " :\"#{key}\" => #{value.value}"
+          " #{key}: #{value.value}"
         else
-          " :\"#{key}\" => \"#{value}\""
+          " #{key}: \"#{value}\""
         end
       end
     end

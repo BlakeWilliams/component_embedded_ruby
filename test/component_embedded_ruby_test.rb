@@ -10,15 +10,27 @@ class ComponentEmbeddedRubyTest < Minitest::Test
       "Hello world!"
     end
 
+    def render(renderable, &block)
+      renderable.render_in(&block)
+    end
+
     def get_binding
       binding
     end
   end
 
   class Component
-    def render(attrs, children)
-      "<div data-capitalize=\"#{attrs[:capitalize]}\">" +
-        "#{children.upcase}" +
+    def initialize(capitalize:, id: nil)
+      @capitalize = capitalize
+      @id = id
+    end
+
+    # override render_in because crb doesn't care about view context yet
+    def render_in
+      content = block_given? ? yield(self) : ""
+
+      "<div data-capitalize=\"#{@capitalize}\">" +
+        "#{content.upcase}" +
       "</div>"
     end
   end
