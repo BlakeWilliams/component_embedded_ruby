@@ -2,14 +2,35 @@ require "test_helper"
 
 module ComponentEmbeddedRuby
   class RendererTest < Minitest::Test
-    class Component
-      def render(attrs, children)
-        children + " #{attrs[:name]}"
+    class View
+      def render(renderable, &block)
+        renderable.render_in &block
+      end
+
+      def get_binding
+        binding
       end
     end
 
-    class SpanComponent
-      def render(attrs, children)
+    class Component < ViewComponent::Base
+      def initialize(name:)
+        @name = name
+      end
+
+      def render_in
+        children = block_given? ? yield(self) : ""
+
+        children + " #{name}"
+      end
+
+      private
+      attr_reader :name
+    end
+
+    class SpanComponent < ViewComponent::Base
+      def render_in
+        children = block_given? ? yield(self) : ""
+
         "<span>" + children + "</span>"
       end
     end
@@ -41,7 +62,7 @@ module ComponentEmbeddedRuby
       </ComponentEmbeddedRuby::RendererTest::Component>
       EOF
 
-      assert_equal "hello ruby", Renderer.new(nodes).to_s
+      assert_equal "hello ruby", Renderer.new(nodes).to_s(binding: View.new.get_binding)
     end
 
     def test_handles_nested_components
@@ -55,11 +76,15 @@ module ComponentEmbeddedRuby
       </ComponentEmbeddedRuby::RendererTest::Component>
       EOF
 
-      assert_equal "hello ruby rails", Renderer.new(nodes).to_s
+      assert_equal "hello ruby rails", Renderer.new(nodes).to_s(binding: View.new.get_binding)
     end
 
     def test_handles_nested_components_with_dynamic_binding
       view_model = Struct.new(:prefix, :suffix) do
+        def render(renderable, &block)
+          renderable.render_in(&block)
+        end
+
         def get_binding
           binding
         end
@@ -80,6 +105,10 @@ module ComponentEmbeddedRuby
 
     def test_handles_looped_nested_components
       view_model = Struct.new(:names) do
+        def render(renderable, &block)
+          renderable.render_in(&block)
+        end
+
         def get_binding
           binding
         end
@@ -89,7 +118,7 @@ module ComponentEmbeddedRuby
       {- names.each do |name|}
         <ComponentEmbeddedRuby::RendererTest::SpanComponent>
           <ComponentEmbeddedRuby::RendererTest::Component name={name}>
-          {- if name == "dhh" }
+          {- if name == "mulder" }
             hello
           {- else }
             hey
@@ -99,7 +128,7 @@ module ComponentEmbeddedRuby
       {- end }
       EOF
 
-      assert_equal "<span>hello dhh</span><span>hey matz</span>", Renderer.new(nodes).to_s(binding: view_model.new(["dhh", "matz"]).get_binding)
+      assert_equal "<span>hello mulder</span><span>hey scully</span>", Renderer.new(nodes).to_s(binding: view_model.new(["mulder", "scully"]).get_binding)
     end
 
     def parse_and_lex(content)
