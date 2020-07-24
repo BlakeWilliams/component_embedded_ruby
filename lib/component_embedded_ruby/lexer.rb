@@ -1,47 +1,47 @@
 module ComponentEmbeddedRuby
   class Lexer
     Token = Struct.new(:type, :value, :position)
+    Position = Struct.new(:line, :column)
 
     def initialize(content)
-      @content = content.freeze
-      @position = 0
+      @reader = InputReader.new(content)
+
       @tokens = []
-      @last_token = nil
     end
 
     def lex
-      while position != @content.length
-        char = content[@position]
+      while !reader.eof?
+        char = reader.current_char
 
         if char == "<"
           add_token(:open_carrot, "<")
-          @position += 1
+          reader.next
         elsif char == ">"
           add_token(:close_carrot, ">")
-          @position += 1
+          reader.next
         elsif char == "="
           add_token(:equals, "=")
-          @position += 1
+          reader.next
         elsif char == "\""
           add_token(:string, read_quoted_string)
         elsif char == "/"
           add_token(:slash, "/")
-          @position += 1
+          reader.next
         elsif char == "{"
-          if next_token == "-"
-            @position += 1
+          if reader.peek == "-"
+            reader.next
             add_token(:ruby_no_eval, read_ruby_string)
           else
             add_token(:ruby, read_ruby_string)
           end
         elsif is_letter?(char)
-          if @last_token&.type == :close_carrot
+          if @tokens[-1]&.type == :close_carrot
             add_token(:string, read_body_string)
           else
             add_token(:identifier, read_string)
           end
         else
-          @position += 1
+          reader.next
         end
       end
 
@@ -50,29 +50,20 @@ module ComponentEmbeddedRuby
 
     private
 
-    attr_reader :content
+    attr_reader :reader
     attr_accessor :position
 
     def add_token(type, value)
-      token = Token.new(type, value, @position)
-      @last_token = token
+      token = Token.new(type, value, Position.new(reader.current_line, reader.current_column))
       @tokens << token
-    end
-
-    def current_token
-      content[@position]
-    end
-
-    def next_token
-      content[@position + 1]
     end
 
     def read_string
       string = ""
 
-      while is_letter?(current_token) && @position < @content.length
-        string += current_token
-        @position += 1
+      while is_letter?(reader.current_char) && !reader.eof?
+        string += reader.current_char
+        reader.next
       end
 
       string
@@ -82,16 +73,16 @@ module ComponentEmbeddedRuby
       string = ""
 
       # Get past initial "
-      @position += 1
+      reader.next
 
       while !unescaped_quote?
-        raise "unterminated string" if @position > @content.length
-        string += current_token
-        @position += 1
+        raise "unterminated string" if reader.eof?
+        string += reader.current_char
+        reader.next
       end
 
       # Get past last "
-      @position += 1
+      reader.next
 
       string
     end
@@ -99,10 +90,11 @@ module ComponentEmbeddedRuby
     def read_body_string
       string = ""
 
-      while current_token != "<" && current_token != "{"
-        raise "unterminated content" if @position > @content.length
-        string += current_token
-        @position += 1
+      while reader.current_char != "<" && reader.current_char != "{"
+        raise "unterminated content" if reader.eof?
+
+        string += reader.current_char
+        reader.next
       end
 
       string
@@ -114,13 +106,13 @@ module ComponentEmbeddedRuby
 
       string = ""
 
-      @position += 1
+      reader.next
 
       previous_token = nil
 
       loop do
-        break if inner_bracket_count == 0 && inner_string_count % 2 == 0 && current_token == "}"
-        char = current_token
+        break if inner_bracket_count == 0 && inner_string_count % 2 == 0 && reader.current_char == "}"
+        char = reader.current_char
         string += char
 
         # TODO handle " and ' separately
@@ -133,14 +125,14 @@ module ComponentEmbeddedRuby
         end
 
         previous_token = char
-        @position += 1
+        reader.next
       end
 
       string
     end
 
     def unescaped_quote?
-      current_token == "\"" && @content[@position -1] != "\\"
+      reader.current_char == "\"" && reader.peek_behind != "\\"
     end
 
     def is_letter?(char)
