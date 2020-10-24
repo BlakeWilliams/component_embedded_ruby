@@ -144,9 +144,9 @@ DEPENDENCIES
   component_embedded_ruby!
   minitest (~> 5.0)
   pry (~> 0.12.2)
-  rails (> 6.0)
+  rails
   rake (~> 10.0)
   view_component (> 2.15)
 
 BUNDLED WITH
-   1.17.2
+   1.17.3

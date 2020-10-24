@@ -16,4 +16,12 @@ module ComponentEmbeddedRuby
       ).parse
     ).to_s(binding: binding)
   end
+
+  def self.to_source(content, binding: TOPLEVEL_BINDING)
+    Renderer.new(
+      Parser.new(
+        Lexer.new(content).lex
+      ).parse
+    ).to_ruby
+  end
 end
