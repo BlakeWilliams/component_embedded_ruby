@@ -7,7 +7,7 @@ module ComponentEmbeddedRuby
     def to_ruby
       tokens = Lexer.new(@template).lex
       nodes = Parser.parse(tokens)
-      Renderer.new(nodes).to_ruby
+      Compiler.new(nodes).to_ruby
     end
 
     def to_s(binding: TOPLEVEL_BINDING)

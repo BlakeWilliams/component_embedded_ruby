@@ -1,7 +1,7 @@
 require "test_helper"
 
 module ComponentEmbeddedRuby
-  class RendererTest < Minitest::Test
+  class CompilerTest < Minitest::Test
     class View
       def render(renderable, &block)
         renderable.render_in(&block)
@@ -38,7 +38,7 @@ module ComponentEmbeddedRuby
     def test_handles_multiple_tags
       nodes = parse_and_lex("<h1>Hello!</h1><h6>Goodbye!</h6>")
 
-      assert_equal "<h1>Hello!</h1><h6>Goodbye!</h6>", eval(Renderer.new(nodes).to_ruby)
+      assert_equal "<h1>Hello!</h1><h6>Goodbye!</h6>", eval(Compiler.new(nodes).to_ruby)
     end
 
     def test_handles_nested_components_with_dynamic_binding
@@ -53,16 +53,16 @@ module ComponentEmbeddedRuby
       end
 
       nodes = parse_and_lex <<~EOF
-      <ComponentEmbeddedRuby::RendererTest::Component name={suffix}>
-        <ComponentEmbeddedRuby::RendererTest::Component name={prefix}>
+      <ComponentEmbeddedRuby::CompilerTest::Component name={suffix}>
+        <ComponentEmbeddedRuby::CompilerTest::Component name={prefix}>
           {- if 1 > 0 }
             hello
           {- end }
-        </ComponentEmbeddedRuby::RendererTest::Component>
-      </ComponentEmbeddedRuby::RendererTest::Component>
+        </ComponentEmbeddedRuby::CompilerTest::Component>
+      </ComponentEmbeddedRuby::CompilerTest::Component>
       EOF
 
-      assert_equal "hello ruby rails", eval(Renderer.new(nodes).to_ruby, view_model.new("ruby", "rails").get_binding)
+      assert_equal "hello ruby rails", eval(Compiler.new(nodes).to_ruby, view_model.new("ruby", "rails").get_binding)
     end
 
     def parse_and_lex(content)

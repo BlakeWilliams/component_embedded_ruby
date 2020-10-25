@@ -1,5 +1,5 @@
 module ComponentEmbeddedRuby
-  class Renderer
+  class Compiler
     def initialize(nodes, output_var_name: "__crb_out", skip_return: false)
       @nodes = Array(nodes)
       @functions = {}
