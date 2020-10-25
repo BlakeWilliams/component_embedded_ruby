@@ -10,7 +10,7 @@ module ComponentEmbeddedRuby
         @tokens[@position]
       end
 
-      def peek
+      def peek_token
         @tokens[@position + 1]
       end
 

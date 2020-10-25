@@ -7,8 +7,14 @@ module ComponentEmbeddedRuby
 
       private
 
+      attr_reader :token_reader
+
       def current_token
         @token_reader.current_token
+      end
+
+      def peek_token
+        @token_reader.peek_token
       end
 
       def expect(type)
