@@ -1,3 +1,5 @@
+require "component_embedded_ruby/lexer/input_reader"
+
 module ComponentEmbeddedRuby
   class Lexer
     Token = Struct.new(:type, :value, :position)

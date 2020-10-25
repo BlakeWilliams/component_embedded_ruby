@@ -1,9 +1,9 @@
 require "test_helper"
 
 module ComponentEmbeddedRuby
-  class InputReaderTest < Minitest::Test
+  class LexerInputReaderTest < Minitest::Test
     def test_input_reading
-      reader = InputReader.new("hello\nworld\nrad")
+      reader = Lexer::InputReader.new("hello\nworld\nrad")
 
       assert_equal 0, reader.current_line
       assert_equal 0, reader.current_column

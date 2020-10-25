@@ -1,5 +1,4 @@
 require "component_embedded_ruby/version"
-require "component_embedded_ruby/input_reader"
 require "component_embedded_ruby/lexer"
 require "component_embedded_ruby/parser"
 require "component_embedded_ruby/eval"
