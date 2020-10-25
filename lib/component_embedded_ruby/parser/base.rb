@@ -13,8 +13,8 @@ module ComponentEmbeddedRuby
         @token_reader.current_token
       end
 
-      def peek_token(n = 1)
-        @token_reader.peek_token(n)
+      def peek_token
+        @token_reader.peek_token
       end
 
       def expect(type)

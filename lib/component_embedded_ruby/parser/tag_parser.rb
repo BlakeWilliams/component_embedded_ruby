@@ -42,8 +42,6 @@ module ComponentEmbeddedRuby
       # If the next two elements are </, we can safely asume it's meant to
       # close the current tag and lets us avoid having to attempt parsing
       # children.
-      #
-      # TODO maybe this can be moved to the root parser? should it?
       def has_children?
         return true if current_token.type != :open_carrot
         return true if peek_token&.type != :slash
