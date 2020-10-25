@@ -13,7 +13,7 @@ module ComponentEmbeddedRuby
       @tokens = []
     end
 
-    def lex
+    def lex # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
       while !reader.eof?
         char = reader.current_char
 
@@ -106,7 +106,7 @@ module ComponentEmbeddedRuby
       string
     end
 
-    def read_ruby_string
+    def read_ruby_string # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       inner_string_count = 0
       inner_bracket_count = 0
 

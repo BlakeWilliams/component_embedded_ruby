@@ -21,7 +21,7 @@ module ComponentEmbeddedRuby
 
     private
 
-    def render(node)
+    def render(node) # rubocop:disable Metrics/PerceivedComplexity
       if node.component?
         <<~RUBY
           #{children_to_ruby(node)}

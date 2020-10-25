@@ -3,11 +3,6 @@ Metrics/MethodLength:
   Exclude:
     - 'test/**/*.rb'
 
-Metrics/MethodLength:
-  Max: 20
-  Exclude:
-    - 'test/**/*.rb'
-
 Metrics/ClassLength:
   Max: 150
   Exclude:
@@ -35,6 +30,6 @@ Style/StringLiterals:
 Naming/MemoizedInstanceVariableName:
   EnforcedStyleForLeadingUnderscores: required
 
-AccessorMethodName:
+Naming/AccessorMethodName:
   Exclude:
     - 'test/**/*.rb'
