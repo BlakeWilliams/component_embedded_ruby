@@ -1,3 +1,5 @@
+require "component_embedded_ruby/parser/base"
+require "component_embedded_ruby/parser/attribute_parser"
 require "component_embedded_ruby/parser/token_reader"
 
 module ComponentEmbeddedRuby
@@ -46,9 +48,15 @@ module ComponentEmbeddedRuby
     def parse_tag
       @token_reader.next
 
+      # Expects an identifier, e.g. "h1"
       tag = expect(:identifier).value
-      attributes = parse_attributes
 
+      # Expects 0 or more attributes
+      # e.g. id="hello" in <h1 id="hello">
+      attributes = AttributeParser.new(@token_reader).call
+
+
+      # Is this a self-closing element?
       if current_token.type == :slash
         expect(:slash)
         expect(:close_carrot)
@@ -75,36 +83,6 @@ module ComponentEmbeddedRuby
 
     def parse_children
       parse(inside_tag: true)
-    end
-
-    def parse_attributes
-      attributes = {}
-
-      while current_token.type != :close_carrot && current_token.type != :slash
-        attributes.merge!(parse_attribute)
-      end
-
-      attributes
-    end
-
-    def parse_attribute
-      key = expect(:identifier).value
-
-      if current_token.type != :equals
-        raise UnexpectedTokenError.new(:equals, current_token)
-      else
-        @token_reader.next
-      end
-
-      value_token = expect_any(:string, :ruby)
-
-      if value_token.type == :string
-        value = value_token.value
-      else
-        value = Eval.new(value_token.value)
-      end
-
-      { key => value }
     end
 
     def current_token
