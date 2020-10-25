@@ -14,7 +14,7 @@ module ComponentEmbeddedRuby
     end
 
     def lex
-      until reader.eof?
+      while !reader.eof?
         char = reader.current_char
 
         if char == "<"
@@ -80,7 +80,7 @@ module ComponentEmbeddedRuby
       # Get past initial "
       reader.next
 
-      until unescaped_quote?
+      while !unescaped_quote?
         raise "unterminated string" if reader.eof?
 
         string += reader.current_char
