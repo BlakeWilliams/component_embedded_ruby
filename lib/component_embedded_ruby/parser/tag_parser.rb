@@ -1,131 +1,73 @@
 module ComponentEmbeddedRuby
-  class Parser
-    class TagParser
-      def initialize(parser)
-        @parser = parser
-      end
+  module Parser
+    # Internal: Parses an HTML tag into a Node object
+    #
+    # This class is responsible for parsing an HTML element into a node
+    # instance. There are three variations of tags:
+    #
+    # * A self-closing tag e.g. <hr/>
+    # * A tag with no children <img src="/favicon.png"></img>
+    # * A tag with children e.g. <b>bold text!</b>
+    #
+    # A tag with children will delegate back to the `RootParser` since child
+    # elements can be any combination of adjacent tags, strings, and ruby code.
+    #
+    class TagParser < Base
+      def call
+        # Expect opening carrot, e.g. < in <h1>
+        expect(:open_carrot)
 
-      def to_node
-      end
+        # Expects an identifier, e.g. "h1"
+        tag = expect(:identifier).value
 
-      def parse
-        parser.move
+        # Expects 0 or more attributes
+        # e.g. id="hello" in <h1 id="hello">
+        attributes = AttributeParser.new(@token_reader).call
 
-        if parser.current_token.type != :identifier
-          raise UnexpectedTokenError.new(:identifier, parser.current_token)
+        # Is this a self-closing element?
+        if current_token.type == :slash
+          expect(:slash)
+          expect(:close_carrot)
+
+          Node.new(tag, attributes, [])
         else
-          tag = parser.current_token.value
-        end
-
-        parser.move
-        attributes = parse_attributes
-
-        if parser.current_token.type == :slash
-          parser.move
-
-          if parser.current_token.type != :close_carrot
-            raise UnexpectedTokenError.new(:close_carrot, parser.current_token)
-          else
-            parser.move
-          end
-
-          {
-            tag: tag,
-            attributes: attributes,
-            children: [],
-          }
-        else
-          parser.move
+          expect(:close_carrot)
 
           children = parse_children
 
-          if parser.current_token.type != :open_carrot
-            raise UnexpectedTokenError.new(:open_carrot, parser.current_token)
-          else
-            parser.move
+          expect(:open_carrot)
+          expect(:slash)
+          close_tag = expect(:identifier).value
+
+          if close_tag != tag
+            raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
           end
 
-          if parser.current_token.type != :slash
-            raise UnexpectedTokenError.new(:slash, parser.current_token)
-          else
-            parser.move
-          end
+          expect(:close_carrot)
 
-          if parser.current_token.type != :identifier
-            raise UnexpectedTokenError.new(:identifier, parser.current_token)
-          elsif parser.current_token.value != tag
-            raise "Mismatched tags. expected #{tag}, got #{parser.current_token.value}"
-          else
-            parser.move
-          end
-
-          if parser.current_token.type != :close_carrot
-            raise UnexpectedTokenError.new(:close_carrot, parser.current_token)
-          else
-            parser.move
-          end
-
-          {
-            tag: tag,
-            attributes: attributes,
-            children: children,
-          }
+          Node.new(tag, attributes, children)
         end
       end
 
       private
 
+      # If the next two elements are </, we can safely asume it's meant to
+      # close the current tag and lets us avoid having to attempt parsing
+      # children.
+      def has_children?
+        return true if current_token.type != :open_carrot
+        return true if peek_token&.type != :slash
+
+        false
+      end
+
       def parse_children
-        children = []
-        child = parser.parse_tag
-
-        while child != nil
-          children.push(child)
-          child = parser.parse_tag
-        end
-
-        children
-      end
-
-      def parse_attributes
-        attributes = []
-
-        while parser.current_token.type != :close_carrot && parser.current_token.type != :slash
-          attributes.push(parse_attribute)
-        end
-
-        attributes
-      end
-
-      def parse_attribute
-        if parser.current_token.type != :identifier
-          raise UnexpectedTokenError.new(:identifier, parser.current_token)
+        if has_children?
+          RootParser.new(@token_reader).call
         else
-          key = parser.current_token.value
-          parser.move
+          []
         end
-
-        if parser.current_token.type != :equals
-          raise UnexpectedTokenError.new(:equals, parser.current_token)
-        else
-          parser.move
-        end
-
-        if parser.current_token.type != :string && parser.current_token.type != :ruby
-          raise UnexpectedTokenError.new(:string, parser.current_token)
-        else
-          if parser.current_token.type == :string
-            value = parser.current_token.value
-          else
-            value = Eval.new(parser.current_token.value)
-          end
-          parser.move
-        end
-
-        { key: key, value: value }
       end
-
-      attr_reader :parser
     end
   end
 end

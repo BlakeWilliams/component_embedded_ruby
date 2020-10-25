@@ -4,7 +4,7 @@ module ComponentEmbeddedRuby
   class ParserTest < Minitest::Test
     def test_it_parses_basic_html
       lexer = Lexer.new("<html></html>")
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = Node.new(
         "html",
@@ -17,7 +17,7 @@ module ComponentEmbeddedRuby
 
     def test_parses_multiple_children
       lexer = Lexer.new("<header></header><footer></footer>")
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = [
         Node.new("header", {}, []),
@@ -29,7 +29,7 @@ module ComponentEmbeddedRuby
 
     def test_it_parses_nested_html
       lexer = Lexer.new("<html><p></p></html>")
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = Node.new(
         "html",
@@ -44,7 +44,7 @@ module ComponentEmbeddedRuby
 
     def test_it_parses_adjacent_html
       lexer = Lexer.new("<html><p></p><b></b></html>")
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = Node.new(
         "html",
@@ -60,7 +60,7 @@ module ComponentEmbeddedRuby
 
     def test_it_parses_string_content_as_children
       lexer = Lexer.new("<b>Hello world</b>")
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = Node.new(
         "b",
@@ -75,7 +75,7 @@ module ComponentEmbeddedRuby
 
     def test_it_parses_html_attributes
       lexer = Lexer.new('<b id="rad">Hello world</b>')
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = Node.new(
         "b",
@@ -90,7 +90,7 @@ module ComponentEmbeddedRuby
 
     def test_parses_self_closing_tags
       lexer = Lexer.new('<div><img src="#"/></div>')
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = Node.new(
         "div",
@@ -105,7 +105,7 @@ module ComponentEmbeddedRuby
 
     def test_parses_eval_attributes
       lexer = Lexer.new('<b id={rad}></b>')
-      results = Parser.new(lexer.lex).parse
+      results = Parser.parse(lexer.lex)
 
       expected = Node.new(
         "b",
@@ -126,7 +126,7 @@ module ComponentEmbeddedRuby
       )
 
       assert_raises UnexpectedTokenError do |error|
-        Parser.new(lexer.lex).parse
+        Parser.parse(lexer.lex)
 
         assert_equal "Unexpected token at column 2, got < but expected identifier", error.message
       end

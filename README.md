@@ -65,7 +65,7 @@ e.g. the most basic example could look like this:
 def render(renderable, &block)
   # This assumes components being rendered utilize `to_s` to render their
   # templates
-  renderable.to_s(&nlock)
+  renderable.to_s(&block)
 end
 ```
 

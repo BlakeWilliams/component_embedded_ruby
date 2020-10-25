@@ -66,9 +66,9 @@ module ComponentEmbeddedRuby
     end
 
     def parse_and_lex(content)
-      Parser.new(
+      Parser.parse(
         Lexer.new(content).lex
-      ).parse
+      )
     end
   end
 end
