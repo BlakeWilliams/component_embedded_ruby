@@ -25,14 +25,13 @@ module ComponentEmbeddedRuby
             if peek_token.type == :slash
               return results
             else
-              results << TagParser.new(@token_reader).call
+              results << TagParser.new(token_reader).call
             end
           elsif current_token.type == :string || current_token.type == :identifier
             # If we're reading a string, or some other identifier that is on
             # its own, we can skip instantiating a new parser and parse it directly ourselves
-            results << Node.new(nil, nil, current_token.value).tap do
-              @token_reader.next
-            end
+            results << Node.new(nil, nil, current_token.value)
+            token_reader.next
           elsif current_token.type == :ruby || current_token.type == :ruby_no_eval
             # If we run into Ruby code that should be evaluated inside of the
             # template, we want to create an `Eval`. The compliation step
@@ -40,9 +39,8 @@ module ComponentEmbeddedRuby
             # provided ruby code compatibile with the compiled template code.
             value = Eval.new(current_token.value, output: current_token.type == :ruby)
 
-            results << Node.new(nil, nil, value).tap do
-              @token_reader.next
-            end
+            results << Node.new(nil, nil, value)
+            token_reader.next
           end
         end
 

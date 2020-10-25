@@ -22,7 +22,7 @@ module ComponentEmbeddedRuby
 
         # Expects 0 or more attributes
         # e.g. id="hello" in <h1 id="hello">
-        attributes = AttributeParser.new(@token_reader).call
+        attributes = AttributeParser.new(token_reader).call
 
         # Is this a self-closing element?
         if current_token.type == :slash
@@ -63,7 +63,7 @@ module ComponentEmbeddedRuby
 
       def parse_children
         if has_children?
-          RootParser.new(@token_reader).call
+          RootParser.new(token_reader).call
         else
           []
         end

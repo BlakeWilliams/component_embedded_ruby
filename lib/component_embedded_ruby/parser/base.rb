@@ -10,11 +10,11 @@ module ComponentEmbeddedRuby
       attr_reader :token_reader
 
       def current_token
-        @token_reader.current_token
+        token_reader.current_token
       end
 
       def peek_token
-        @token_reader.peek_token
+        token_reader.peek_token
       end
 
       def expect(type)
@@ -23,7 +23,7 @@ module ComponentEmbeddedRuby
         if token.type != type
           raise UnexpectedTokenError.new(:string, current_token)
         else
-          @token_reader.next
+          token_reader.next
         end
 
         token
@@ -35,7 +35,7 @@ module ComponentEmbeddedRuby
         if !types.include?(token.type)
           raise UnexpectedTokenError.new(:string, token)
         else
-          @token_reader.next
+          token_reader.next
         end
 
         token
