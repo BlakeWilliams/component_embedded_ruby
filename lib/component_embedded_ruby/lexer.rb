@@ -106,7 +106,7 @@ module ComponentEmbeddedRuby
       string
     end
 
-    def read_ruby_string # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+    def read_ruby_string # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
       inner_double_quotes = 0
       inner_single_quotes = 0
       inner_bracket_count = 0

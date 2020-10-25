@@ -213,7 +213,7 @@ module ComponentEmbeddedRuby
       lexer = Lexer.new("{\"isn't ruby great?\"}")
 
       expected = [
-        Lexer::Token.new(:ruby, '"isn\'t ruby great?"'),
+        Lexer::Token.new(:ruby, '"isn\'t ruby great?"')
       ]
 
       assert_types_and_values_equal expected, lexer.lex
