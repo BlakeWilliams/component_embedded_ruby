@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 module ComponentEmbeddedRuby
@@ -51,7 +53,7 @@ module ComponentEmbeddedRuby
         {},
         [
           Node.new("p", {}, []),
-          Node.new("b", {}, []),
+          Node.new("b", {}, [])
         ]
       )
 
@@ -104,7 +106,7 @@ module ComponentEmbeddedRuby
     end
 
     def test_parses_eval_attributes
-      lexer = Lexer.new('<b id={rad}></b>')
+      lexer = Lexer.new("<b id={rad}></b>")
       results = Parser.parse(lexer.lex)
 
       expected = Node.new(
@@ -117,7 +119,7 @@ module ComponentEmbeddedRuby
     end
 
     def test_unexpected_any_token_raises
-      lexer = Lexer.new('<b id=1></b>')
+      lexer = Lexer.new("<b id=1></b>")
 
       Node.new(
         "b",
@@ -129,12 +131,12 @@ module ComponentEmbeddedRuby
         Parser.parse(lexer.lex)
       end
 
-      # TODO these could turn into very descriptive, and helpful errors
+      # TODO: these could turn into very descriptive, and helpful errors
       assert_equal "Unexpected token at line 1, column 7\nGot `1` but expected a string or ruby code", exception.message
     end
 
     def test_unexpected_token_raises
-      lexer = Lexer.new('<b</b>')
+      lexer = Lexer.new("<b</b>")
 
       Node.new(
         "b",

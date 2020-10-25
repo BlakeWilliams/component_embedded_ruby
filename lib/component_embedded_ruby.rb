@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "component_embedded_ruby/version"
 require "component_embedded_ruby/lexer"
 require "component_embedded_ruby/parser"

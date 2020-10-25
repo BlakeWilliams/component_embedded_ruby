@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 module ComponentEmbeddedRuby
@@ -24,6 +26,7 @@ module ComponentEmbeddedRuby
       end
 
       private
+
       attr_reader :name
     end
 
@@ -31,7 +34,7 @@ module ComponentEmbeddedRuby
       def render_in
         children = block_given? ? yield(self) : ""
 
-        "<span>" + children + "</span>"
+        "<span>#{children}</span>"
       end
     end
 
@@ -52,15 +55,15 @@ module ComponentEmbeddedRuby
         end
       end
 
-      nodes = parse_and_lex <<~EOF
-      <ComponentEmbeddedRuby::CompilerTest::Component name={suffix}>
-        <ComponentEmbeddedRuby::CompilerTest::Component name={prefix}>
-          {- if 1 > 0 }
-            hello
-          {- end }
+      nodes = parse_and_lex <<~TEMPLATE
+        <ComponentEmbeddedRuby::CompilerTest::Component name={suffix}>
+          <ComponentEmbeddedRuby::CompilerTest::Component name={prefix}>
+            {- if 1 > 0 }
+              hello
+            {- end }
+          </ComponentEmbeddedRuby::CompilerTest::Component>
         </ComponentEmbeddedRuby::CompilerTest::Component>
-      </ComponentEmbeddedRuby::CompilerTest::Component>
-      EOF
+      TEMPLATE
 
       assert_equal "hello ruby rails", eval(Compiler.new(nodes).to_ruby, view_model.new("ruby", "rails").get_binding)
     end

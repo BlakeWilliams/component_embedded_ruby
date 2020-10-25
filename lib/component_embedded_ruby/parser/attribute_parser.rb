@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   module Parser
     # Internal: Parses an HTML tag attributes into a hash of key values
@@ -17,9 +19,7 @@ module ComponentEmbeddedRuby
       def call
         attributes = {}
 
-        while current_token.type == :identifier
-          attributes.merge!(parse_attribute)
-        end
+        attributes.merge!(parse_attribute) while current_token.type == :identifier
 
         attributes
       end

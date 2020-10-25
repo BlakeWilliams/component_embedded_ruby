@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   class Template
     def initialize(template)
@@ -11,7 +13,7 @@ module ComponentEmbeddedRuby
     end
 
     def to_s(binding: TOPLEVEL_BINDING)
-      eval(to_ruby, binding)
+      eval(to_ruby, binding) # rubocop:disable Security/Eval
     end
   end
 end

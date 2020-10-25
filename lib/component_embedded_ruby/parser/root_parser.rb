@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   module Parser
     # Internal: Used for parsing multiple adjacent tag, string, and emedded
@@ -12,7 +14,8 @@ module ComponentEmbeddedRuby
         results = []
 
         while current_token
-          if current_token.type == :open_carrot
+          case current_token.type
+          when :open_carrot
             # If we run into a </ we are likely at the end of parsing a tag so
             # this should return and let the `TagParser` complete parsing
             #
@@ -22,17 +25,15 @@ module ComponentEmbeddedRuby
             #     children, and will use another instance of `RootParser` to reads its children
             # 3. The new RootParser reads `Hello`, then runs into `</`, so it should return `["Hello"]`
             #     and allow the `TagParser` to finish reading `</h1>`
-            if peek_token.type == :slash
-              return results
-            else
-              results << TagParser.new(token_reader).call
-            end
-          elsif current_token.type == :string || current_token.type == :identifier
+            return results if peek_token.type == :slash
+
+            results << TagParser.new(token_reader).call
+          when :string, :identifier
             # If we're reading a string, or some other identifier that is on
             # its own, we can skip instantiating a new parser and parse it directly ourselves
             results << Node.new(nil, nil, current_token.value)
             token_reader.next
-          elsif current_token.type == :ruby || current_token.type == :ruby_no_eval
+          when :ruby, :ruby_no_eval
             # If we run into Ruby code that should be evaluated inside of the
             # template, we want to create an `Eval`. The compliation step
             # handles `Eval` objects specially since it's making template

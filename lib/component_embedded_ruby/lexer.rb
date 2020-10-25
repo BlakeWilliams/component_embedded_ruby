@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "component_embedded_ruby/lexer/input_reader"
 
 module ComponentEmbeddedRuby
@@ -12,7 +14,7 @@ module ComponentEmbeddedRuby
     end
 
     def lex
-      while !reader.eof?
+      until reader.eof?
         char = reader.current_char
 
         if char == "<"
@@ -24,7 +26,7 @@ module ComponentEmbeddedRuby
         elsif char == "="
           add_token(:equals, "=")
           reader.next
-        elsif char == "\""
+        elsif char == '"'
           add_token(:string, read_quoted_string)
         elsif char == "/"
           add_token(:slash, "/")
@@ -36,7 +38,7 @@ module ComponentEmbeddedRuby
           else
             add_token(:ruby, read_ruby_string)
           end
-        elsif is_letter?(char)
+        elsif letter?(char)
           position = Position.new(reader.current_line, reader.current_column)
 
           if @tokens[-1]&.type == :close_carrot
@@ -64,7 +66,7 @@ module ComponentEmbeddedRuby
     def read_string
       string = ""
 
-      while is_letter?(reader.current_char) && !reader.eof?
+      while letter?(reader.current_char) && !reader.eof?
         string += reader.current_char
         reader.next
       end
@@ -78,8 +80,9 @@ module ComponentEmbeddedRuby
       # Get past initial "
       reader.next
 
-      while !unescaped_quote?
+      until unescaped_quote?
         raise "unterminated string" if reader.eof?
+
         string += reader.current_char
         reader.next
       end
@@ -114,16 +117,17 @@ module ComponentEmbeddedRuby
       previous_token = nil
 
       loop do
-        break if inner_bracket_count == 0 && inner_string_count % 2 == 0 && reader.current_char == "}"
+        break if inner_bracket_count.zero? && inner_string_count.even? && reader.current_char == "}"
+
         char = reader.current_char
         string += char
 
-        # TODO handle " and ' separately
-        if inner_string_count % 2 == 0 && char == "{"
+        # TODO: handle " and ' separately
+        if inner_string_count.even? && char == "{"
           inner_bracket_count += 1
-        elsif inner_string_count % 2 == 0 && char == "}"
+        elsif inner_string_count.even? && char == "}"
           inner_bracket_count -= 1
-        elsif previous_token != "\\" && char == "\"" || char == "'"
+        elsif previous_token != '\\' && char == '"' || char == "'"
           inner_string_count -= 1
         end
 
@@ -135,10 +139,10 @@ module ComponentEmbeddedRuby
     end
 
     def unescaped_quote?
-      reader.current_char == "\"" && reader.peek_behind != "\\"
+      reader.current_char == '"' && reader.peek_behind != '\\'
     end
 
-    def is_letter?(char)
+    def letter?(char)
       ascii = char.ord
       (ascii >= 48 && ascii <= 57) || (ascii >= 65 && ascii <= 122) || ascii == 45 || ascii == 95 || ascii == 58
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   class Node
     attr_reader :tag, :attributes, :children

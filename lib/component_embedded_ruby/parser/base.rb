@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   module Parser
     class Base
@@ -19,25 +21,17 @@ module ComponentEmbeddedRuby
 
       def expect(type)
         token = current_token
+        raise UnexpectedTokenError.new(type, current_token) if token.type != type
 
-        if token.type != type
-          raise UnexpectedTokenError.new(type, current_token)
-        else
-          token_reader.next
-        end
-
+        token_reader.next
         token
       end
 
       def expect_any(*types, expected_message:)
         token = current_token
+        raise UnexpectedTokenError.new(expected_message, token) unless types.include?(token.type)
 
-        if !types.include?(token.type)
-          raise UnexpectedTokenError.new(expected_message, token)
-        else
-          token_reader.next
-        end
-
+        token_reader.next
         token
       end
     end
