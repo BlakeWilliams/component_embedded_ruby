@@ -209,6 +209,16 @@ module ComponentEmbeddedRuby
       assert_types_and_values_equal expected, lexer.lex
     end
 
+    def test_handles_mixed_strings_in_ruby
+      lexer = Lexer.new("{\"isn't ruby great?\"}")
+
+      expected = [
+        Lexer::Token.new(:ruby, '"isn\'t ruby great?"'),
+      ]
+
+      assert_types_and_values_equal expected, lexer.lex
+    end
+
     def assert_types_and_values_equal(expected_values, received_values)
       expected_values.zip(received_values).each do |expected, received|
         flunk "#{expected} != #{received}" if expected.type != received.type

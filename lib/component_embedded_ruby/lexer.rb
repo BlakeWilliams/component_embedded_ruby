@@ -107,7 +107,8 @@ module ComponentEmbeddedRuby
     end
 
     def read_ruby_string # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-      inner_string_count = 0
+      inner_double_quotes = 0
+      inner_single_quotes = 0
       inner_bracket_count = 0
 
       string = ""
@@ -117,18 +118,20 @@ module ComponentEmbeddedRuby
       previous_token = nil
 
       loop do
-        break if inner_bracket_count.zero? && inner_string_count.even? && reader.current_char == "}"
+        break if inner_bracket_count.zero? && inner_double_quotes.even? && reader.current_char == "}"
 
         char = reader.current_char
         string += char
 
         # TODO: handle " and ' separately
-        if inner_string_count.even? && char == "{"
+        if inner_double_quotes.even? && char == "{"
           inner_bracket_count += 1
-        elsif inner_string_count.even? && char == "}"
+        elsif inner_double_quotes.even? && char == "}"
           inner_bracket_count -= 1
-        elsif previous_token != '\\' && char == '"' || char == "'"
-          inner_string_count -= 1
+        elsif previous_token != '\\' && char == '"' && inner_single_quotes.even?
+          inner_double_quotes -= 1
+        elsif previous_token != '\\' && char == "'" && inner_double_quotes.even?
+          inner_single_quotes -= 1
         end
 
         previous_token = char
