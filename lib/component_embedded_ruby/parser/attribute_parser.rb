@@ -30,24 +30,21 @@ module ComponentEmbeddedRuby
 
       def parse_attribute
         key = expect(:identifier).value
-
-        if current_token.type != :equals
-          raise UnexpectedTokenError.new(:equals, current_token)
-        else
-          @token_reader.next
-        end
-
-        value_token = expect_any(:string, :ruby)
-
-        if value_token.type == :string
-          value = value_token.value
-        else
-          value = Eval.new(value_token.value)
-        end
+        expect(:equals)
+        value = parse_value
 
         { key => value }
       end
 
+      def parse_value
+        value_token = expect_any(:string, :ruby)
+
+        if value_token.type == :string
+          value_token.value
+        else
+          Eval.new(value_token.value)
+        end
+      end
     end
   end
 end
