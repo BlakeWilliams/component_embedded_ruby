@@ -123,7 +123,6 @@ module ComponentEmbeddedRuby
         char = reader.current_char
         string += char
 
-        # TODO: handle " and ' separately
         if inner_double_quotes.even? && char == "{"
           inner_bracket_count += 1
         elsif inner_double_quotes.even? && char == "}"
