@@ -9,7 +9,7 @@ Strict HTML templating with support for components.
     extra_classes %>`, instead this logic should be pushed up to components.
 * Component rendering has a single dependency, a `render` method being present
   in the rendering context.
-* Rails support
+* automatic Rails support for `crb` extension
 
 ### Usage
 
