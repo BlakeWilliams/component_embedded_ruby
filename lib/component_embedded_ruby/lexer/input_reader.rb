@@ -7,8 +7,8 @@ module ComponentEmbeddedRuby
         @input = input.freeze
         @position = 0
 
-        @current_line = 0
-        @current_column = 0
+        @current_line = 1
+        @current_column = 1
       end
 
       def eof?
@@ -30,7 +30,7 @@ module ComponentEmbeddedRuby
       def next
         if current_char == "\n"
           @current_line += 1
-          @current_column = 0
+          @current_column = 1
         else
           @current_column += 1
         end

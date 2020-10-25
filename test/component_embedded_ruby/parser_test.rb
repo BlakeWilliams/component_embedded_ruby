@@ -125,11 +125,11 @@ module ComponentEmbeddedRuby
         []
       )
 
-      assert_raises UnexpectedTokenError do |error|
+      exception = assert_raises UnexpectedTokenError do
         Parser.parse(lexer.lex)
-
-        assert_equal "Unexpected token at column 2, got < but expected identifier", error.message
       end
+
+      assert_equal "Unexpected token at line 1, column 3\nGot `<` but expected `>`", exception.message
     end
   end
 end

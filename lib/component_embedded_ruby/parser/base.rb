@@ -21,7 +21,7 @@ module ComponentEmbeddedRuby
         token = current_token
 
         if token.type != type
-          raise UnexpectedTokenError.new(:string, current_token)
+          raise UnexpectedTokenError.new(type, current_token)
         else
           token_reader.next
         end

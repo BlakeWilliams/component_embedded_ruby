@@ -8,14 +8,29 @@ module ComponentEmbeddedRuby
     end
 
     def message
-      "Unexpected token at column #{got.position}, got #{got.value}#{expected_message}."
+      "Unexpected token at line #{got.position.line}, column #{got.position.column}\nGot `#{got.value}`#{expected_message}"
     end
 
     private
 
     def expected_message
       if expected != nil
-        " but expected #{expected}"
+        " but expected `#{user_readable_expected}`"
+      end
+    end
+
+    def user_readable_expected
+      case expected
+      when :open_carrot
+        "<"
+      when :close_carrot
+        ">"
+      when :equals
+        "="
+      when :slash
+        "/"
+      else
+        expected
       end
     end
   end

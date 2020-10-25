@@ -17,7 +17,7 @@ module ComponentEmbeddedRuby
       def call
         attributes = {}
 
-        while current_token.type != :close_carrot && current_token.type != :slash
+        while current_token.type == :identifier
           attributes.merge!(parse_attribute)
         end
 
