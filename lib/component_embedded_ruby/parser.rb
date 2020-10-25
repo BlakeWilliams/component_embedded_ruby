@@ -1,8 +1,9 @@
+require "component_embedded_ruby/parser/token_reader"
+
 module ComponentEmbeddedRuby
   class Parser
     def initialize(tokens)
-      @tokens = tokens
-      @position = 0
+      @token_reader = TokenReader.new(tokens)
     end
 
     def parse(inside_tag: false)
@@ -22,13 +23,13 @@ module ComponentEmbeddedRuby
           end
         when :string, :identifier
             results << Node.new(nil, nil, current_token.value).tap do
-            @position += 1
+            @token_reader.next
           end
         when :ruby, :ruby_no_eval
           value = Eval.new(current_token.value, output: current_token.type == :ruby)
 
           results << Node.new(nil, nil, value).tap do
-            @position += 1
+            @token_reader.next
           end
         else
           if inside_tag
@@ -42,10 +43,8 @@ module ComponentEmbeddedRuby
 
     private
 
-    attr_reader :tokens
-
     def parse_tag
-      @position +=1 # already matching a <
+      @token_reader.next
 
       tag = expect(:identifier).value
       attributes = parse_attributes
@@ -94,7 +93,7 @@ module ComponentEmbeddedRuby
       if current_token.type != :equals
         raise UnexpectedTokenError.new(:equals, current_token)
       else
-        @position += 1
+        @token_reader.next
       end
 
       value_token = expect_any(:string, :ruby)
@@ -109,11 +108,11 @@ module ComponentEmbeddedRuby
     end
 
     def current_token
-      tokens[@position]
+      @token_reader.current_token
     end
 
     def next_token
-      tokens[@position + 1]
+      @token_reader.peek
     end
 
     def expect(type)
@@ -122,7 +121,7 @@ module ComponentEmbeddedRuby
       if token.type != type
         raise UnexpectedTokenError.new(:string, current_token)
       else
-        @position += 1
+        @token_reader.next
       end
 
       token
@@ -134,7 +133,7 @@ module ComponentEmbeddedRuby
       if !types.include?(token.type)
         raise UnexpectedTokenError.new(:string, token)
       else
-        @position += 1
+        @token_reader.next
       end
 
       token
