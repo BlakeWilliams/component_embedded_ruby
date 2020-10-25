@@ -55,7 +55,6 @@ module ComponentEmbeddedRuby
     private
 
     attr_reader :reader
-    attr_accessor :position
 
     def add_token(type, value, position = Position.new(reader.current_line, reader.current_column))
       token = Token.new(type, value, position)
