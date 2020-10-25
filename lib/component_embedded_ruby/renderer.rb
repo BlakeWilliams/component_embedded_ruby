@@ -1,22 +1,19 @@
 module ComponentEmbeddedRuby
   class Renderer
-    def initialize(nodes, output_var_name: "__crb_out")
+    def initialize(nodes, output_var_name: "__crb_out", skip_return: false)
       @nodes = Array(nodes)
       @functions = {}
       @output_var_name = output_var_name
-    end
-
-    def to_s(binding: TOPLEVEL_BINDING)
-      eval(to_ruby, binding)
+      @skip_return = skip_return
     end
 
     def to_ruby
-      text = <<~EOF
+      <<~EOF
         #{output_var_name} = '';
 
         #{nodes.map(&method(:render)).join("\n")}
 
-        #{output_var_name};
+        #{output_var_name if !@skip_return};
       EOF
     end
 
@@ -54,7 +51,8 @@ module ComponentEmbeddedRuby
     def children_to_ruby(node)
       self.class.new(
         node.children,
-        output_var_name: "__c_#{node.hash.to_s.gsub("-", "_")}"
+        output_var_name: "__c_#{node.hash.to_s.gsub("-", "_")}",
+        skip_return: true
       ).to_ruby
     end
 

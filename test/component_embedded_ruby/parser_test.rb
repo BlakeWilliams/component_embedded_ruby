@@ -119,7 +119,7 @@ module ComponentEmbeddedRuby
     def test_unexpected_token_raises
       lexer = Lexer.new('<b</b>')
 
-      expected = Node.new(
+      Node.new(
         "b",
         { "id" => Eval.new("rad") },
         []

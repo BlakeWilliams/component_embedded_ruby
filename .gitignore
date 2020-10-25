@@ -6,5 +6,5 @@
 /pkg/
 /spec/reports/
 /tmp/
-/test/test_application/tmp
-/test/test_application/log
+test/test_application/tmp
+test/test_application/log

@@ -33,7 +33,6 @@ module ComponentEmbeddedRuby
         else
           if inside_tag
             return results
-            raise UnexpectedTokenError.new(nil, current_token)
           end
         end
       end
@@ -76,7 +75,7 @@ module ComponentEmbeddedRuby
     end
 
     def parse_children
-      children = parse(inside_tag: true)
+      parse(inside_tag: true)
     end
 
     def parse_attributes

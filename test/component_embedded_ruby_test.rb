@@ -30,8 +30,31 @@ class ComponentEmbeddedRubyTest < Minitest::Test
       content = block_given? ? yield(self) : ""
 
       "<div data-capitalize=\"#{@capitalize}\">" +
-        "#{content.upcase}" +
+        "#{content&.upcase}" +
       "</div>"
+    end
+  end
+
+  class ChildRenderComponent
+    def initialize(name:)
+      @name = name
+    end
+
+    def render_in
+      children = block_given? ? yield(self) : ""
+
+      children + " #{name}"
+    end
+
+    private
+    attr_reader :name
+  end
+
+  class SpanComponent < ViewComponent::Base
+    def render_in
+      children = block_given? ? yield(self) : ""
+
+      "<span>" + children + "</span>"
     end
   end
 
@@ -40,7 +63,7 @@ class ComponentEmbeddedRubyTest < Minitest::Test
   end
 
   def test_it_converts_to_html
-    result = ComponentEmbeddedRuby.render(
+    result = render(
       "<h1 id={id}>{content}</h1>",
       binding: View.new.get_binding
     )
@@ -51,7 +74,7 @@ class ComponentEmbeddedRubyTest < Minitest::Test
   def test_it_renders_components
     binding_class = View.new
 
-    result = ComponentEmbeddedRuby.render(
+    result = render(
       %(
         <h1 id={id}>
           <ComponentEmbeddedRubyTest::Component capitalize="true" id={id}>
@@ -59,7 +82,7 @@ class ComponentEmbeddedRubyTest < Minitest::Test
           </ComponentEmbeddedRubyTest::Component>
         </h1>
       ),
-      binding: binding_class.get_binding
+      binding: binding_class.get_binding,
     )
 
     expected = "<h1 id=\"identifier\"><div data-capitalize=\"true\">HELLO WORLD!</div></h1>"
@@ -67,11 +90,27 @@ class ComponentEmbeddedRubyTest < Minitest::Test
     assert_equal expected, result
   end
 
+  def test_it_renders_nested_components
+    result = render(
+      %(
+        <h1 id={id}>
+          <ComponentEmbeddedRubyTest::SpanComponent>
+            <ComponentEmbeddedRubyTest::Component capitalize="true" id={id}>
+              {content}
+            </ComponentEmbeddedRubyTest::Component>
+          </ComponentEmbeddedRubyTest::SpanComponent>
+        </h1>
+      ),
+      binding: View.new.get_binding
+    )
+
+    expected = "<h1 id=\"identifier\"><span><div data-capitalize=\"true\">HELLO WORLD!</div></span></h1>"
+
+    assert_equal expected, result
+  end
 
   def test_handles_if_statements
-    binding_class = View.new
-
-    result = ComponentEmbeddedRuby.render(
+    result = render(
       %(
         <h1 id={id}>
           {- if 1 > 0}
@@ -81,7 +120,7 @@ class ComponentEmbeddedRubyTest < Minitest::Test
           {- end }
         </h1>
       ),
-      binding: binding_class.get_binding
+      binding: View.new.get_binding
     )
 
     expected = "<h1 id=\"identifier\">hello</h1>"
@@ -92,16 +131,13 @@ class ComponentEmbeddedRubyTest < Minitest::Test
   def test_handles_top_level_escaped_ruby
     binding_class = View.new
 
-    result = ComponentEmbeddedRuby.render(
-      %(
-        {- if false }
-          hello
-        {- else }
-          wat
-        {- end }
-      ),
-      binding: binding_class.get_binding
-    )
+    result = render(<<~ERB, binding: binding_class.get_binding)
+      {- if false }
+        hello
+      {- else }
+        wat
+      {- end }
+    ERB
 
     expected = "wat"
 
@@ -111,23 +147,52 @@ class ComponentEmbeddedRubyTest < Minitest::Test
   def test_handles_if_statements_in_components
     binding_class = View.new
 
-    result = ComponentEmbeddedRuby.render(
-      %(
-        <h1 id={id}>
-          <ComponentEmbeddedRubyTest::Component capitalize="true" id={id}>
-            {- if 1 > 0}
-              {content}
-            {- else }
-              wat
-            {- end }
-          </ComponentEmbeddedRubyTest::Component>
-        </h1>
-      ),
-      binding: binding_class.get_binding
-    )
+    result = render(<<~EOF, binding: binding_class.get_binding)
+      <h1 id={id}>
+        <ComponentEmbeddedRubyTest::Component capitalize="true" id={id}>
+          {- if 1 > 0}
+            {content}
+          {- else }
+            wat
+          {- end }
+        </ComponentEmbeddedRubyTest::Component>
+      </h1>
+    EOF
 
     expected = "<h1 id=\"identifier\"><div data-capitalize=\"true\">HELLO WORLD!</div></h1>"
 
     assert_equal expected, result
+  end
+
+  def test_handles_looped_nested_components
+    view_model = Struct.new(:names) do
+      def render(renderable, &block)
+        renderable.render_in(&block)
+      end
+
+      def get_binding
+        binding
+      end
+    end
+
+    result = render( <<~EOF, binding: view_model.new(["mulder", "scully"]).get_binding)
+    {- names.each do |name|}
+      <ComponentEmbeddedRubyTest::SpanComponent>
+        <ComponentEmbeddedRubyTest::ChildRenderComponent name={name}>
+          {- if name == "mulder" }
+            hello
+          {- else }
+            hey
+          {- end }
+        </ComponentEmbeddedRubyTest::ChildRenderComponent>
+      </ComponentEmbeddedRubyTest::SpanComponent>
+    {- end }
+    EOF
+
+    assert_equal "<span>hello mulder</span><span>hey scully</span>", result
+  end
+
+  def render(source, binding: TOPLEVEL_BINDING)
+    ComponentEmbeddedRuby::Template.new(source).to_s(binding: binding)
   end
 end
