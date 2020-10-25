@@ -53,7 +53,7 @@ module ComponentEmbeddedRuby
 
       def parse_children
         if has_children?
-          RootParser.new(@token_reader).parse(inside_tag: true)
+          RootParser.new(@token_reader).call
         else
           []
         end

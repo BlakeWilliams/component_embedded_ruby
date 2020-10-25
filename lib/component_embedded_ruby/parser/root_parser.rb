@@ -1,18 +1,14 @@
 module ComponentEmbeddedRuby
   class Parser
     class RootParser < Base
-      def parse(inside_tag: false)
+      def call
         results = []
 
         while current_token
           case current_token.type
           when :open_carrot
             if peek_token.type == :slash # close tag
-              if inside_tag
-                return results
-              else
-                nil
-              end
+              return results
             else
               results << TagParser.new(@token_reader).call
             end

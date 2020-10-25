@@ -10,8 +10,8 @@ module ComponentEmbeddedRuby
       @token_reader = TokenReader.new(tokens)
     end
 
-    def parse(inside_tag: false)
-      RootParser.new(@token_reader).parse(inside_tag: inside_tag)
+    def parse
+      RootParser.new(@token_reader).call
     end
   end
 end
