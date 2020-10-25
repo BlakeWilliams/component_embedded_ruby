@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   class Eval
     attr_reader :value, :output

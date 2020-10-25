@@ -1,0 +1,38 @@
+AllCops:
+  TargetRubyVersion: 2.5
+
+Metrics/MethodLength:
+  Max: 20
+  Exclude:
+    - 'test/**/*.rb'
+
+Metrics/ClassLength:
+  Max: 150
+  Exclude:
+    - 'test/**/*.rb'
+
+Metrics/AbcSize:
+  Enabled: false
+
+Security/Eval:
+  Exclude:
+    - 'test/**/*.rb'
+
+Lint/MissingSuper:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/NegatedWhile:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Naming/MemoizedInstanceVariableName:
+  EnforcedStyleForLeadingUnderscores: required
+
+Naming/AccessorMethodName:
+  Exclude:
+    - 'test/**/*.rb'

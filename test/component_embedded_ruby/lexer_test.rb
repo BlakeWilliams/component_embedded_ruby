@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 module ComponentEmbeddedRuby
@@ -12,7 +14,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:open_carrot, "<"),
         Lexer::Token.new(:slash, "/"),
         Lexer::Token.new(:identifier, "html"),
-        Lexer::Token.new(:close_carrot, ">"),
+        Lexer::Token.new(:close_carrot, ">")
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -31,7 +33,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "html"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -57,7 +59,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "html"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -71,20 +73,20 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:identifier, "p"),
         Lexer::Token.new(:identifier, "name"),
         Lexer::Token.new(:equals, nil),
-        Lexer::Token.new(:string, "hello >< \\\" world!"),
+        Lexer::Token.new(:string, 'hello >< \\" world!'),
         Lexer::Token.new(:close_carrot, nil),
 
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "p"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
     end
 
     def test_text_is_parsed_correctly
-      lexer = Lexer.new('<p>hello! this is !@#(*!^& content</p>')
+      lexer = Lexer.new("<p>hello! this is !@#(*!^& content</p>")
 
       expected = [
         Lexer::Token.new(:open_carrot, nil),
@@ -96,7 +98,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "p"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -118,7 +120,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "p"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -140,7 +142,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "p"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -162,7 +164,7 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "p"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -176,13 +178,13 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:identifier, "p"),
         Lexer::Token.new(:close_carrot, nil),
 
-        Lexer::Token.new(:string, 'hello '),
+        Lexer::Token.new(:string, "hello "),
         Lexer::Token.new(:ruby, '"world!"'),
 
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "p"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
@@ -196,26 +198,27 @@ module ComponentEmbeddedRuby
         Lexer::Token.new(:identifier, "p"),
         Lexer::Token.new(:close_carrot, nil),
 
-        Lexer::Token.new(:string, 'world!'),
+        Lexer::Token.new(:string, "world!"),
 
         Lexer::Token.new(:open_carrot, nil),
         Lexer::Token.new(:slash, nil),
         Lexer::Token.new(:identifier, "p"),
-        Lexer::Token.new(:close_carrot, nil),
+        Lexer::Token.new(:close_carrot, nil)
       ]
 
       assert_types_and_values_equal expected, lexer.lex
     end
 
-    def assert_types_and_values_equal(expected, received)
-      expected.zip(received).each do |expected, received|
-        if expected.type != received.type
-          flunk "#{expected} != #{received}"
-        end
+    def assert_types_and_values_equal(expected_values, received_values)
+      expected_values.zip(received_values).each do |expected, received|
+        flunk "#{expected} != #{received}" if expected.type != received.type
 
-        if expected.value != received.value && (expected.type == :string || expected.type == :identifier || expected.type == :ruby)
-          flunk "#{expected} != #{received}"
-        end
+        next unless expected.value != received.value &&
+                    (expected.type == :string ||
+                     expected.type == :identifier ||
+                     expected.type == :ruby)
+
+        flunk "#{expected} != #{received}"
       end
     end
   end

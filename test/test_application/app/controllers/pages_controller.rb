@@ -1,7 +1,7 @@
-class PagesController < ApplicationController
-  def show
-  end
+# frozen_string_literal: true
 
-  def renderable
-  end
+class PagesController < ApplicationController
+  def show; end
+
+  def renderable; end
 end

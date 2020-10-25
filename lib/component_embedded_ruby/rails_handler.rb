@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   class RailsHandler
     def self.call(template, source = nil)

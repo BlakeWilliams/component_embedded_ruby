@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentEmbeddedRuby
   module Parser
     # Internal: Parses an HTML tag into a Node object
@@ -39,9 +41,7 @@ module ComponentEmbeddedRuby
           expect(:slash)
           close_tag = expect(:identifier).value
 
-          if close_tag != tag
-            raise "Mismatched tags. expected #{tag}, got #{current_token.value}"
-          end
+          raise "Mismatched tags. expected #{tag}, got #{current_token.value}" if close_tag != tag
 
           expect(:close_carrot)
 
@@ -51,22 +51,22 @@ module ComponentEmbeddedRuby
 
       private
 
-      # If the next two elements are </, we can safely asume it's meant to
-      # close the current tag and lets us avoid having to attempt parsing
-      # children.
-      def has_children?
-        return true if current_token.type != :open_carrot
-        return true if peek_token&.type != :slash
-
-        false
-      end
-
       def parse_children
-        if has_children?
+        if children?
           RootParser.new(token_reader).call
         else
           []
         end
+      end
+
+      # If the next two elements are </, we can safely asume it's meant to
+      # close the current tag and lets us avoid having to attempt parsing
+      # children.
+      def children?
+        return true if current_token.type != :open_carrot
+        return true if peek_token&.type != :slash
+
+        false
       end
     end
   end

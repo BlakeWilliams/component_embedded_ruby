@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "component_embedded_ruby/parser/base"
 require "component_embedded_ruby/parser/root_parser"
 require "component_embedded_ruby/parser/attribute_parser"
