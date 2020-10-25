@@ -1,13 +1,20 @@
 module ComponentEmbeddedRuby
   module Parser
+    # Internal: Used for parsing multiple adjacent tag, string, and emedded
+    # ruby into an array.
+    #
+    # This parser is used to parse top-level documents and the children of
+    # `tag` nodes, which may have any combination of adjacent tag, string, and
+    # ruby nodes.
+    #
     class RootParser < Base
       def call
         results = []
 
         while current_token
           if current_token.type == :open_carrot
-            # If we run into a </ we have are likely at the end of parsing a tag
-            # so this should return and let the `TagParser` complete parsing
+            # If we run into a </ we are likely at the end of parsing a tag so
+            # this should return and let the `TagParser` complete parsing
             #
             # e.g.
             # 1. <h1>Hello</h1> would start a `TagParser` after reading <h1

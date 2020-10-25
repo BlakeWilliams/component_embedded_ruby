@@ -1,5 +1,17 @@
 module ComponentEmbeddedRuby
   module Parser
+    # Internal: Parses an HTML tag into a Node object
+    #
+    # This class is responsible for parsing an HTML element into a node
+    # instance. There are three variations of tags:
+    #
+    # * A self-closing tag e.g. <hr/>
+    # * A tag with no children <img src="/favicon.png"></img>
+    # * A tag with children e.g. <b>bold text!</b>
+    #
+    # A tag with children will delegate back to the `RootParser` since child
+    # elements can be any combination of adjacent tags, strings, and ruby code.
+    #
     class TagParser < Base
       def call
         # Expect opening carrot, e.g. < in <h1>
