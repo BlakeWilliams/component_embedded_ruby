@@ -1,5 +1,5 @@
 module ComponentEmbeddedRuby
-  class Parser
+  module Parser
     class TokenReader
       def initialize(tokens)
         @tokens = tokens

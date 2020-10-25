@@ -1,5 +1,5 @@
 module ComponentEmbeddedRuby
-  class Parser
+  module Parser
     class RootParser < Base
       def call
         results = []

@@ -6,7 +6,7 @@ module ComponentEmbeddedRuby
 
     def to_ruby
       tokens = Lexer.new(@template).lex
-      nodes = Parser.new(tokens).parse
+      nodes = Parser.parse(tokens)
       Renderer.new(nodes).to_ruby
     end
 

@@ -1,5 +1,5 @@
 module ComponentEmbeddedRuby
-  class Parser
+  module Parser
     class TagParser < Base
       def call
         # Expect opening carrot, e.g. < in <h1>

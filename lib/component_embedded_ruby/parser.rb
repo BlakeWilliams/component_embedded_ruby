@@ -5,12 +5,10 @@ require "component_embedded_ruby/parser/tag_parser"
 require "component_embedded_ruby/parser/token_reader"
 
 module ComponentEmbeddedRuby
-  class Parser
-    def initialize(tokens)
+  module Parser
+    def self.parse(tokens)
       @token_reader = TokenReader.new(tokens)
-    end
 
-    def parse
       RootParser.new(@token_reader).call
     end
   end

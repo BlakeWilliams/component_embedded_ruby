@@ -1,5 +1,5 @@
 module ComponentEmbeddedRuby
-  class Parser
+  module Parser
     class AttributeParser < Base
       def call
         attributes = {}
