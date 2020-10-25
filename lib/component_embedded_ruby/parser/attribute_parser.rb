@@ -37,7 +37,7 @@ module ComponentEmbeddedRuby
       end
 
       def parse_value
-        value_token = expect_any(:string, :ruby)
+        value_token = expect_any(:string, :ruby, expected_message: "a string or ruby code")
 
         if value_token.type == :string
           value_token.value

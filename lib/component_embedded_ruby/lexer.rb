@@ -37,10 +37,12 @@ module ComponentEmbeddedRuby
             add_token(:ruby, read_ruby_string)
           end
         elsif is_letter?(char)
+          position = Position.new(reader.current_line, reader.current_column)
+
           if @tokens[-1]&.type == :close_carrot
-            add_token(:string, read_body_string)
+            add_token(:string, read_body_string, position)
           else
-            add_token(:identifier, read_string)
+            add_token(:identifier, read_string, position)
           end
         else
           reader.next
@@ -55,8 +57,8 @@ module ComponentEmbeddedRuby
     attr_reader :reader
     attr_accessor :position
 
-    def add_token(type, value)
-      token = Token.new(type, value, Position.new(reader.current_line, reader.current_column))
+    def add_token(type, value, position = Position.new(reader.current_line, reader.current_column))
+      token = Token.new(type, value, position)
       @tokens << token
     end
 

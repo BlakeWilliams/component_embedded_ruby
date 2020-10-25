@@ -15,20 +15,20 @@ module ComponentEmbeddedRuby
 
     def expected_message
       if expected != nil
-        " but expected `#{user_readable_expected}`"
+        " but expected #{user_readable_expected}"
       end
     end
 
     def user_readable_expected
       case expected
       when :open_carrot
-        "<"
+        "`<`"
       when :close_carrot
-        ">"
+        "`>`"
       when :equals
-        "="
+        "`=`"
       when :slash
-        "/"
+        "`/`"
       else
         expected
       end

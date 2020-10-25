@@ -116,6 +116,23 @@ module ComponentEmbeddedRuby
       assert_equal expected, results.first
     end
 
+    def test_unexpected_any_token_raises
+      lexer = Lexer.new('<b id=1></b>')
+
+      Node.new(
+        "b",
+        { "id" => Eval.new("rad") },
+        []
+      )
+
+      exception = assert_raises UnexpectedTokenError do
+        Parser.parse(lexer.lex)
+      end
+
+      # TODO these could turn into very descriptive, and helpful errors
+      assert_equal "Unexpected token at line 1, column 7\nGot `1` but expected a string or ruby code", exception.message
+    end
+
     def test_unexpected_token_raises
       lexer = Lexer.new('<b</b>')
 

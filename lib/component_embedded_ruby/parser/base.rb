@@ -29,11 +29,11 @@ module ComponentEmbeddedRuby
         token
       end
 
-      def expect_any(*types)
+      def expect_any(*types, expected_message:)
         token = current_token
 
         if !types.include?(token.type)
-          raise UnexpectedTokenError.new(:string, token)
+          raise UnexpectedTokenError.new(expected_message, token)
         else
           token_reader.next
         end
