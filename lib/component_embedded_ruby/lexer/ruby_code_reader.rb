@@ -15,13 +15,17 @@ module ComponentEmbeddedRuby
           current_char = input_reader.current_char
 
           break if current_char == "}"
+
           string += current_char
 
           if current_char == "{"
             string += RubyCodeReader.new(input_reader).read_until_closing_tag
-            string += "}" # RubyCodeReader reads until "}", so we have to re-add that char
+
+            # RubyCodeReader reads until "}", so we have to re-add that
+            # character when reading nested code
+            string += "}"
           elsif current_char == "'" || current_char == '"'
-            # TODO this *may* need to handle % syntax strings too
+            # TODO: this *may* need to handle % syntax strings too
             string += StringReader.new(
               input_reader,
               quote_type: current_char,
@@ -30,7 +34,7 @@ module ComponentEmbeddedRuby
           end
         end
 
-        return string
+        string
       end
 
       private

@@ -30,6 +30,12 @@ Style/NegatedWhile:
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
+Style/CaseLikeIf:
+  Enabled: false
+
+Style/MultipleComparison:
+  Enabled: false
+
 Naming/MemoizedInstanceVariableName:
   EnforcedStyleForLeadingUnderscores: required
 

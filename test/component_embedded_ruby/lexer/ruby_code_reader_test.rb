@@ -2,6 +2,7 @@
 
 require "test_helper"
 
+# rubocop:disable Lint/InterpolationCheck, Style/RedundantPercentQ
 module ComponentEmbeddedRuby
   class LexerStringReaderTest < Minitest::Test
     def test_basic_string
@@ -21,51 +22,51 @@ module ComponentEmbeddedRuby
     end
 
     def test_double_quoted_string_with_single_quote
-      reader = input_reader_for(%q[{"isn't ruby great?"}])
+      reader = input_reader_for(%q({"isn't ruby great?"}))
 
       result = Lexer::RubyCodeReader.new(reader).read_until_closing_tag
 
-      assert_equal %q["isn't ruby great?"], result
+      assert_equal %q("isn't ruby great?"), result
     end
 
     def test_parses_hash
-      reader = input_reader_for(%q[{{ key: value }}])
+      reader = input_reader_for(%q({{ key: value }}))
 
       result = Lexer::RubyCodeReader.new(reader).read_until_closing_tag
 
-      assert_equal %q[{ key: value }], result
+      assert_equal %q({ key: value }), result
     end
 
     def test_parses_nested_hash
-      reader = input_reader_for(%q[{{ key: { a: { b: 1 } } }}])
+      reader = input_reader_for(%q({{ key: { a: { b: 1 } } }}))
 
       result = Lexer::RubyCodeReader.new(reader).read_until_closing_tag
 
-      assert_equal %q[{ key: { a: { b: 1 } } }], result
+      assert_equal %q({ key: { a: { b: 1 } } }), result
     end
 
     def test_handles_bracket_in_string
-      reader = input_reader_for(%q[{"isn't ruby { great?"}])
+      reader = input_reader_for(%q({"isn't ruby { great?"}))
 
       result = Lexer::RubyCodeReader.new(reader).read_until_closing_tag
 
-      assert_equal %q["isn't ruby { great?"], result
+      assert_equal %q("isn't ruby { great?"), result
     end
 
     def test_parses_interpolated_ruby
-      reader = input_reader_for(%q[{"hello #{""}"}])
+      reader = input_reader_for(%q({"hello #{""}"}))
 
       result = Lexer::RubyCodeReader.new(reader).read_until_closing_tag
 
-      assert_equal %q["hello #{""}"], result
+      assert_equal %q("hello #{""}"), result
     end
 
     def test_parses_nested_interpolated_ruby
-      reader = input_reader_for(%q[{"hello #{"{"}"}])
+      reader = input_reader_for(%q({"hello #{"{"}"}))
 
       result = Lexer::RubyCodeReader.new(reader).read_until_closing_tag
 
-      assert_equal %q["hello #{"{"}"], result
+      assert_equal %q("hello #{"{"}"), result
     end
 
     def input_reader_for(input)
@@ -73,3 +74,4 @@ module ComponentEmbeddedRuby
     end
   end
 end
+# rubocop:enable Lint/InterpolationCheck, Style/RedundantPercentQ
