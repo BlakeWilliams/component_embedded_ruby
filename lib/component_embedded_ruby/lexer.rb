@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "component_embedded_ruby/lexer/input_reader"
+require "component_embedded_ruby/lexer/string_reader"
+require "component_embedded_ruby/lexer/ruby_code_reader"
 
 module ComponentEmbeddedRuby
   class Lexer
@@ -106,38 +108,8 @@ module ComponentEmbeddedRuby
       string
     end
 
-    def read_ruby_string # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
-      inner_double_quotes = 0
-      inner_single_quotes = 0
-      inner_bracket_count = 0
-
-      string = ""
-
-      reader.next
-
-      previous_token = nil
-
-      loop do
-        break if inner_bracket_count.zero? && inner_double_quotes.even? && reader.current_char == "}"
-
-        char = reader.current_char
-        string += char
-
-        if inner_double_quotes.even? && char == "{"
-          inner_bracket_count += 1
-        elsif inner_double_quotes.even? && char == "}"
-          inner_bracket_count -= 1
-        elsif previous_token != '\\' && char == '"' && inner_single_quotes.even?
-          inner_double_quotes -= 1
-        elsif previous_token != '\\' && char == "'" && inner_double_quotes.even?
-          inner_single_quotes -= 1
-        end
-
-        previous_token = char
-        reader.next
-      end
-
-      string
+    def read_ruby_string
+      RubyCodeReader.new(reader).read_until_closing_tag
     end
 
     def unescaped_quote?
