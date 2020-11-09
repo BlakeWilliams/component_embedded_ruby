@@ -72,6 +72,15 @@ class ComponentEmbeddedRubyTest < Minitest::Test
     assert_equal '<h1 id="identifier">Hello world!</h1>', result
   end
 
+  def test_it_converts_static_attributes
+    result = render(
+      "<h1 id=\"1\">{content}</h1>",
+      binding: View.new.get_binding
+    )
+
+    assert_equal '<h1 id="1">Hello world!</h1>', result
+  end
+
   def test_it_renders_components
     binding_class = View.new
 
