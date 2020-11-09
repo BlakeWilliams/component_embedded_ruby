@@ -86,7 +86,7 @@ GIT
 PATH
   remote: .
   specs:
-    component_embedded_ruby (0.3.0)
+    component_embedded_ruby (0.3.1)
 
 GEM
   remote: https://rubygems.org/
