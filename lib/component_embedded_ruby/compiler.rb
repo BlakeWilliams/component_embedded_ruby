@@ -78,7 +78,7 @@ module ComponentEmbeddedRuby
           RUBY
         else
           <<~RUBY
-          #{output_var_name}.<< " #{key}=\\"#{value}\\""
+            #{output_var_name}.<< " #{key}=\\"#{value}\\""
           RUBY
         end
       end
