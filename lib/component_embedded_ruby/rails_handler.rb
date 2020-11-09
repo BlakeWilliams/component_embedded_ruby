@@ -5,7 +5,17 @@ module ComponentEmbeddedRuby
     def self.call(template, source = nil)
       source ||= template.source
 
-      Template.new(source).to_ruby
+      template_source = Template.new(
+        source,
+        safe_append_method: "safe_append=",
+        unsafe_append_method: "append=",
+        output_var_name: "@output_buffer"
+      ).to_ruby
+
+      <<~RUBY
+        @output_buffer = ActionView::OutputBuffer.new('')
+        #{template_source}
+      RUBY
     end
   end
 end
